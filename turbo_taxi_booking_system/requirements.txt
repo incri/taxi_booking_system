@@ -1,0 +1,6 @@
+pillow
+psycopg
+tkcalendar
+tkintermapview
+haversine
+pydantic
