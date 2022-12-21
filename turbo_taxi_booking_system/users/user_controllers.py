@@ -1,3 +1,4 @@
+import re
 from tkinter import messagebox
 from helper.exceptions import CustomException
 from helper.turbo_db import Turbo_db
@@ -75,9 +76,10 @@ class UserController:
         signup_frame.destroy()
 
     def login_control(self, user, login_frame, root):
-        if not self.login_authenticate(user):
-            messagebox.showerror("Invalid Data", "Bad Data !!")
-        self.login_sucess(root, login_frame)
+        if self.login_authenticate(user):
+            self.login_sucess(root, login_frame)
+        else:
+            messagebox.showerror("Invalid Data", "username or password not matched")
 
     def login_authenticate(self, user):
         cursor = self._connection.cursor()
@@ -105,7 +107,60 @@ class UserController:
         DashboardPage(
             root,
             self.record,
+            UserController,
         ),
 
-    def delete_account():
-        pass
+    def delete_account(
+        self,
+        profile_frame,
+        dashboard_frame,
+        edit_bio_frame,
+        record,
+    ):
+        for data in record:
+            fetched_username = data[6]
+        try:
+
+            cursor = self._connection.cursor()
+            statement = """DELETE FROM users WHERE username = %s;"""
+            data_values = (fetched_username,)
+            cursor.execute(statement, data_values)
+            self._connection.commit()
+
+            messagebox.showinfo(
+                "Sucess!!",
+                "Account Sucessfully deleted !",
+            )
+
+            edit_bio_frame.destroy()
+            profile_frame.destroy()
+            dashboard_frame.destroy()
+
+        except Exception as e:
+            print(e)
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if self._connection is not None:
+                self._connection.close()
+
+    def change_profile(self, user, record):
+
+        for data in record:
+            fetched_firstname = data[6]
+        try:
+            image_path = user.profile
+            new_profile = open(image_path, "rb").read()
+            cursor = self._connection.cursor()
+            statement = """UPDATE users
+            SET profile = %s WHERE username = %s;"""
+            dataValues = (
+                psycopg2.Binary(new_profile),
+                fetched_firstname,
+            )
+
+            cursor.execute(statement, dataValues)
+            self._connection.commit()
+
+        except Exception as e:
+            print(e)

@@ -6,9 +6,10 @@ from .profile_page import ProfilePage
 
 
 class DashboardPage:
-    def __init__(self, root, record):
+    def __init__(self, root, record, user_controller):
         self.root = root
         self.record = record
+        self.user_controller = user_controller
         self.create_dashboard_frame()
 
     def create_dashboard_frame(self):
@@ -19,10 +20,16 @@ class DashboardPage:
             dashboard_frame=self.dashboard_frame,
             root=self.root,
             record=self.record,
+            user_controller=self.user_controller,
         )
 
     @staticmethod
-    def build_dashboard_frame(dashboard_frame, root, record):
+    def build_dashboard_frame(
+        dashboard_frame,
+        root,
+        record,
+        user_controller,
+    ):
 
         title = tk.Label(dashboard_frame)
         title.place(relx=0.452, rely=0.285, height=40, width=212)
@@ -72,6 +79,7 @@ class DashboardPage:
                 root,
                 dashboard_frame,
                 record,
+                user_controller,
             ),
         )
 
@@ -93,5 +101,10 @@ class DashboardPage:
         dashboard_frame.mainloop()
 
     @staticmethod
-    def redirect_to_profile_page(root, dashboard_frame, record):
-        ProfilePage(root, dashboard_frame, record)
+    def redirect_to_profile_page(
+        root,
+        dashboard_frame,
+        record,
+        user_controller,
+    ):
+        ProfilePage(root, dashboard_frame, record, user_controller)

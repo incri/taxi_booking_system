@@ -1,17 +1,17 @@
-from distutils.command.build import build
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from helper.constants import LOGO_LOCATION
 from PIL import Image, ImageTk
 from io import BytesIO
-from .user_controllers import UserController
+from .user_model import UserModel
 
 
 class ProfilePage:
-    def __init__(self, root, dashboard_frame, record):
+    def __init__(self, root, dashboard_frame, record, user_controller):
         self.root = root
         self.dashboard_frame = dashboard_frame
         self.record = record
+        self.user_controller = user_controller
         self.create_profile_frame()
 
     def create_profile_frame(self):
@@ -28,10 +28,17 @@ class ProfilePage:
             root=self.root,
             dashboard_frame=self.dashboard_frame,
             record=self.record,
+            user_controller=self.user_controller,
         )
 
     @staticmethod
-    def build_dashboard_frame(profile_frame, root, dashboard_frame, record):
+    def build_dashboard_frame(
+        profile_frame,
+        root,
+        dashboard_frame,
+        record,
+        user_controller,
+    ):
 
         logo = tk.Label(profile_frame)
         logo.place(x=91, y=60, height=81, width=82)
@@ -157,6 +164,10 @@ class ProfilePage:
             borderwidth="2",
             compound="left",
             text="""Edit Profile >""",
+            command=lambda: ProfilePage.edit_account_profile(
+                user_controller,
+                record,
+            ),
         )
 
         edit_bio_button = tk.Button(profile_frame)
@@ -166,7 +177,13 @@ class ProfilePage:
             borderwidth="2",
             compound="left",
             text="""Edit Bio >""",
-            command=lambda: ProfilePage.create_edit_bio_page(root, record),
+            command=lambda: ProfilePage.create_edit_bio_page(
+                root,
+                record,
+                user_controller,
+                profile_frame,
+                dashboard_frame,
+            ),
         )
 
         upcoming_trips = tk.Label(profile_frame)
@@ -224,16 +241,34 @@ class ProfilePage:
             dashboard_frame.destroy()
 
     @staticmethod
-    def create_edit_bio_page(root, record):
+    def create_edit_bio_page(
+        root,
+        record,
+        user_controller,
+        profile_frame,
+        dashboard_frame,
+    ):
         edit_bio_frame = tk.Toplevel(root)
         edit_bio_frame.title("Edit Bio")
         edit_bio_frame.resizable(0, 0)
         edit_bio_frame.configure(background="#FFFFFF")
         edit_bio_frame.geometry("460x579+420+91")
-        ProfilePage.build_edit_bio_page(edit_bio_frame, record)
+        ProfilePage.build_edit_bio_page(
+            edit_bio_frame,
+            record,
+            user_controller,
+            profile_frame,
+            dashboard_frame,
+        )
 
     @staticmethod
-    def build_edit_bio_page(edit_bio_frame, record):
+    def build_edit_bio_page(
+        edit_bio_frame,
+        record,
+        user_controller,
+        profile_frame,
+        dashboard_frame,
+    ):
 
         welcome = tk.Label(edit_bio_frame)
         welcome.place(relx=0.413, rely=0.069, height=41, width=104)
@@ -508,7 +543,13 @@ class ProfilePage:
             compound="left",
             font="-family {Noto Sans} -size 10",
             text="""Delete Account""",
-            command=lambda: ProfilePage.delete_accout(),
+            command=lambda: ProfilePage.delete_account(
+                user_controller,
+                profile_frame,
+                dashboard_frame,
+                edit_bio_frame,
+                record,
+            ),
         )
 
         cancel_button = tk.Button(edit_bio_frame)
@@ -551,12 +592,42 @@ class ProfilePage:
         edit_bio_frame.destroy()
 
     @staticmethod
-    def delete_accout():
-        account_control = UserController()
+    def delete_account(
+        user_controller,
+        profile_frame,
+        dashboard_frame,
+        edit_bio_frame,
+        record,
+    ):
+        account_control = user_controller()
         response = messagebox.askquestion(
             "Delete Account",
             "Do you really want to delete your account? \n  \
             you wont be able to recover your account again",
         )
         if response == "yes":
-            account_control.deleteAccount()
+            account_control.delete_account(
+                profile_frame,
+                dashboard_frame,
+                edit_bio_frame,
+                record,
+            )
+
+    @staticmethod
+    def edit_account_profile(user_controller, record):
+        for data in record:
+            fetched_password = data[7]
+
+        file = filedialog.askopenfilename()
+        if file:
+            responce = messagebox.askquestion(
+                "Update", "Do you really want to update? \n updating will log you out"
+            )
+            if responce == "yes":
+                user = UserModel(
+                    profile=file,
+                    password=fetched_password,
+                    confirm_password=fetched_password,
+                )
+                profile_control = user_controller()
+                profile_control.change_profile(user, record)
