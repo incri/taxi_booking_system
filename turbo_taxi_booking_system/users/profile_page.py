@@ -1,9 +1,11 @@
+from errno import ESTALE
 import tkinter as tk
 from tkinter import messagebox, filedialog
 from helper.constants import LOGO_LOCATION
 from PIL import Image, ImageTk
 from io import BytesIO
 from .user_model import UserModel
+from helper.exceptions import CustomException
 
 
 class ProfilePage:
@@ -23,7 +25,7 @@ class ProfilePage:
             height=768,
             width=1366,
         )
-        self.build_dashboard_frame(
+        self.build_profile_frame(
             profile_frame=self.profile_frame,
             root=self.root,
             dashboard_frame=self.dashboard_frame,
@@ -32,7 +34,7 @@ class ProfilePage:
         )
 
     @staticmethod
-    def build_dashboard_frame(
+    def build_profile_frame(
         profile_frame,
         root,
         dashboard_frame,
@@ -84,6 +86,8 @@ class ProfilePage:
             anchor="w",
             compound="left",
             text="""profile""",
+            borderwidth=2,
+            relief="solid",
         )
         profile_photo.configure(image=view_profile)
 
@@ -167,6 +171,8 @@ class ProfilePage:
             command=lambda: ProfilePage.edit_account_profile(
                 user_controller,
                 record,
+                profile_frame,
+                dashboard_frame,
             ),
         )
 
@@ -178,7 +184,6 @@ class ProfilePage:
             compound="left",
             text="""Edit Bio >""",
             command=lambda: ProfilePage.create_edit_bio_page(
-                root,
                 record,
                 user_controller,
                 profile_frame,
@@ -242,13 +247,12 @@ class ProfilePage:
 
     @staticmethod
     def create_edit_bio_page(
-        root,
         record,
         user_controller,
         profile_frame,
         dashboard_frame,
     ):
-        edit_bio_frame = tk.Toplevel(root)
+        edit_bio_frame = tk.Toplevel(profile_frame)
         edit_bio_frame.title("Edit Bio")
         edit_bio_frame.resizable(0, 0)
         edit_bio_frame.configure(background="#FFFFFF")
@@ -285,7 +289,6 @@ class ProfilePage:
             fetched_firstname = data[1].rstrip()
             fetched_lastname = data[2].rstrip()
             fetched_email = data[5].rstrip()
-            fetched_password = data[7].rstrip()
 
         firstname = tk.Label(edit_bio_frame)
         firstname.place(relx=0.065, rely=0.19, height=41, width=104)
@@ -533,6 +536,18 @@ class ProfilePage:
             font="-family {Noto Sans} -size 12 -weight bold",
             foreground="#FFFFFF",
             text="""Update""",
+            command=lambda: ProfilePage.edit_user_bio(
+                record,
+                edit_bio_frame,
+                profile_frame,
+                dashboard_frame,
+                user_controller,
+                contact_entry,
+                address_entry,
+                username_entry,
+                password_entry,
+                confrim_password_entry,
+            ),
         )
 
         delete_button = tk.Button(edit_bio_frame)
@@ -614,14 +629,20 @@ class ProfilePage:
             )
 
     @staticmethod
-    def edit_account_profile(user_controller, record):
+    def edit_account_profile(
+        user_controller,
+        record,
+        profile_frame,
+        dashboaard_frame,
+    ):
         for data in record:
             fetched_password = data[7]
 
         file = filedialog.askopenfilename()
         if file:
             responce = messagebox.askquestion(
-                "Update", "Do you really want to update? \n updating will log you out"
+                "Update",
+                "Do you really want to update? \n updating will log you out",
             )
             if responce == "yes":
                 user = UserModel(
@@ -629,5 +650,87 @@ class ProfilePage:
                     password=fetched_password,
                     confirm_password=fetched_password,
                 )
-                profile_control = user_controller()
-                profile_control.change_profile(user, record)
+                profile_picture_control = user_controller()
+                profile_picture_control.change_profile(
+                    user,
+                    record,
+                    profile_frame,
+                    dashboaard_frame,
+                )
+
+    @staticmethod
+    def edit_user_bio(
+        record,
+        edit_bio_frame,
+        profile_frame,
+        dashboard_frame,
+        user_controller,
+        contact_entry,
+        address_entry,
+        username_entry,
+        password_entry,
+        confrim_password_entry,
+    ):
+
+        for data in record:
+            fetched_contact = data[3]
+            fetched_address = data[4]
+            fetched_username = data[6]
+            fetched_password = data[7]
+
+        # checking if data is empty or not
+
+        if contact_entry.get() == "":
+            new_contact = fetched_contact
+        else:
+            new_contact = contact_entry.get()
+
+        if address_entry.get() == "":
+            new_address = fetched_address
+        else:
+            new_address = address_entry.get()
+        if username_entry.get() == "":
+            new_username = fetched_username
+        else:
+            new_username = username_entry.get()
+        if confrim_password_entry.get() == "":
+            new_password_update = fetched_password
+        else:
+            new_password_update = confrim_password_entry.get()
+        if password_entry.get() == fetched_password:
+            old_password = password_entry.get()
+        else:
+            messagebox.showerror(
+                "Invalid",
+                "old password not matched!!",
+                parent=edit_bio_frame,
+            )
+
+        try:
+            user = UserModel(
+                contact=new_contact,
+                address=new_address,
+                username=new_username,
+                password=old_password,
+                confirm_password=old_password,
+                new_password=new_password_update,
+            )
+            responce = messagebox.askquestion(
+                "Update",
+                "Do you really want to update? \n updating will log you out",
+                parent=edit_bio_frame,
+            )
+            if responce == "yes":
+                user_bio_control = user_controller()
+                user_bio_control.update_user_bio(
+                    user,
+                    record,
+                    edit_bio_frame,
+                    profile_frame,
+                    dashboard_frame,
+                )
+            else:
+                edit_bio_frame.destroy()
+
+        except CustomException as e:
+            messagebox.showerror("Invalid Data", e, parent=edit_bio_frame)

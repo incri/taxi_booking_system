@@ -1,8 +1,10 @@
+import imp
 import tkinter as tk
 from helper.constants import LOGO_LOCATION
 from PIL import Image, ImageTk
 from io import BytesIO
 from .profile_page import ProfilePage
+from bookings.booking_form import BookingPage
 
 
 class DashboardPage:
@@ -44,7 +46,12 @@ class DashboardPage:
 
         profile_label = tk.Label(dashboard_frame)
         profile_label.place(relx=0.91, rely=0.068, height=61, width=70)
-        profile_label.configure(anchor="w", compound="left")
+        profile_label.configure(
+            anchor="w",
+            compound="left",
+            borderwidth=2,
+            relief="solid",
+        )
 
         for data in record:
             fetched_username = data[6].rstrip()
@@ -96,6 +103,11 @@ class DashboardPage:
             font="-family {Noto Sans} -size 14",
             foreground="#FFFFFF",
             text="""Book Now""",
+            command=lambda: DashboardPage.redirect_to_booking_form(
+                root,
+                dashboard_frame,
+                record,
+            ),
         )
 
         dashboard_frame.mainloop()
@@ -108,3 +120,15 @@ class DashboardPage:
         user_controller,
     ):
         ProfilePage(root, dashboard_frame, record, user_controller)
+
+    @staticmethod
+    def redirect_to_booking_form(
+        root,
+        dashboard_frame,
+        record,
+    ):
+        BookingPage(
+            root,
+            dashboard_frame,
+            record,
+        )

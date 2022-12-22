@@ -53,7 +53,10 @@ class UserController:
             return True
         except Exception as error:
             if "username" in str(error):
-                messagebox.showerror("Invalid Data", "username already exist!!")
+                messagebox.showerror(
+                    "Invalid Data",
+                    "username already exist!!",
+                )
             elif "email" in str(error):
                 messagebox.showerror(
                     "Invalid Data",
@@ -144,7 +147,13 @@ class UserController:
             if self._connection is not None:
                 self._connection.close()
 
-    def change_profile(self, user, record):
+    def change_profile(
+        self,
+        user,
+        record,
+        profile_frame,
+        dashboard_frame,
+    ):
 
         for data in record:
             fetched_firstname = data[6]
@@ -162,5 +171,72 @@ class UserController:
             cursor.execute(statement, dataValues)
             self._connection.commit()
 
+            messagebox.showinfo(
+                "Sucess!!",
+                "Profile Picture Changed !",
+            )
+
+            profile_frame.destroy()
+            dashboard_frame.destroy()
+
         except Exception as e:
             print(e)
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if self._connection is not None:
+                self._connection.close()
+
+    def update_user_bio(
+        self,
+        user,
+        record,
+        edit_bio_frame,
+        profile_frame,
+        dashboard_frame,
+    ):
+        for data in record:
+            fetched_username = data[6]
+        try:
+            cursor = self._connection.cursor()
+            statement = """UPDATE users
+            SET contact = COALESCE(NULLIF(%s,''),contact),
+            address = COALESCE(NULLIF(%s,''),address),
+            username = COALESCE(NULLIF(%s,''),username),
+            password = COALESCE(NULLIF(%s,''),password)
+            WHERE username = %s;"""
+
+            dataValues = (
+                user.contact,
+                user.address,
+                user.username,
+                user.new_password,
+                fetched_username,
+            )
+
+            cursor.execute(statement, dataValues)
+            self._connection.commit()
+
+            messagebox.showinfo(
+                "Sucess!!",
+                "Updated !",
+            )
+
+            edit_bio_frame.destroy()
+            profile_frame.destroy()
+            dashboard_frame.destroy()
+
+        except Exception as error:
+            if "username" in str(error):
+                messagebox.showerror(
+                    "Invalid Data",
+                    "username already exist!!",
+                    parent=edit_bio_frame,
+                )
+            else:
+                print(error)
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if self._connection is not None:
+                self._connection.close()

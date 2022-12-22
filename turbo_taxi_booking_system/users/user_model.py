@@ -23,6 +23,7 @@ class UserModel(BaseModel):
     user_id: str = ""
     message: str = ""
     profile: str = ""
+    new_password: str = ""
 
     @validator("firstname", "lastname")
     def validate_first_name(cls, value):
