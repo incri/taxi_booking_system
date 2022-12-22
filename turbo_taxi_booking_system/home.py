@@ -10,15 +10,14 @@ class HomePage:
     def __init__(self):
 
         self.root = tk.Tk()
-        self.build_root(root=self.root)
+        self.build_root()
         self.create_home_frame()
 
-    @staticmethod
-    def build_root(root):
-        root.title("Main Frame")
-        root.resizable(0, 0)
-        root.configure(background="#000000")
-        root.attributes("-fullscreen", True)
+    def build_root(self):
+        self.root.title("Main Frame")
+        self.root.resizable(0, 0)
+        self.root.configure(background="#FFFFFF")
+        self.root.attributes("-fullscreen", True)
 
     def create_home_frame(self):
         self.home_frame = tk.Frame(self.root)

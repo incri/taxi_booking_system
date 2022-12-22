@@ -1,8 +1,10 @@
 from datetime import date, timedelta
 import imp
+import math
 from tkcalendar import DateEntry
-from tkinter import StringVar
+from tkinter import StringVar, messagebox
 from tkintermapview import TkinterMapView, convert_coordinates_to_address
+import haversine as hs
 
 
 import tkinter as tk
@@ -29,6 +31,10 @@ class BookingPage:
             record=self.record,
             booking_form_frame=self.booking_form_frame,
         )
+
+    pickup_location_coordinates = None
+    destination_coordinates = None
+    button_name = None
 
     @staticmethod
     def build_booking_form_frame(
@@ -256,10 +262,18 @@ class BookingPage:
             compound="left",
             font="-family {Noto Sans} -size 12",
             text="""Select Address""",
-            command=lambda: BookingPage.create_location_picker(
-                booking_form_frame, pickup_address_entry
+        )
+
+        pickup_address_button.bind(
+            "<ButtonRelease-1>",
+            lambda event: BookingPage.create_location_picker(
+                event,
+                booking_form_frame,
+                pickup_address_entry,
             ),
         )
+
+        pickup_address_button.bind("<Button-1>", BookingPage.button_name_finder)
 
         destination = tk.Label(booking_form_frame)
         destination.place(relx=0.044, rely=0.746, height=31, width=134)
@@ -285,10 +299,16 @@ class BookingPage:
             compound="left",
             font="-family {Noto Sans} -size 12",
             text="""Select Address""",
-            command=lambda: BookingPage.create_location_picker(
-                booking_form_frame, destination_entry
+        )
+        destination_button.bind(
+            "<ButtonRelease-1>",
+            lambda event: BookingPage.create_location_picker(
+                event,
+                booking_form_frame,
+                destination_entry,
             ),
         )
+        destination_button.bind("<Button-1>", BookingPage.button_name_finder_2)
 
         total_cost = tk.Label(booking_form_frame)
         total_cost.place(relx=0.044, rely=0.855, height=40, width=144)
@@ -300,16 +320,6 @@ class BookingPage:
             text="""Total Charge :""",
         )
 
-        distance_calculate = tk.Button(booking_form_frame)
-        distance_calculate.place(relx=0.260, rely=0.855, height=33, relwidth=0.122)
-        distance_calculate.configure(
-            activebackground="beige",
-            borderwidth="1",
-            compound="left",
-            font="-family {Noto Sans} -size 12",
-            text="""View Cost""",
-        )
-
         cost = tk.Label(booking_form_frame)
         cost.place(relx=0.155, rely=0.855, height=40, width=143)
         cost.configure(
@@ -318,6 +328,38 @@ class BookingPage:
             compound="left",
             font="-family {Noto Sans} -size 14",
             text="""XXXXXX""",
+        )
+
+        view_total_cost_button = tk.Button(booking_form_frame)
+        view_total_cost_button.place(
+            relx=0.260,
+            rely=0.855,
+            height=33,
+            relwidth=0.122,
+        )
+        view_total_cost_button.configure(
+            activebackground="beige",
+            borderwidth="1",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            text="""View Cost""",
+        )
+
+        view_total_cost_button.bind(
+            "<Button-1>",
+            lambda event: BookingPage.show_cost(
+                event,
+                no_of_taxi_entry,
+                cost,
+            ),
+        )
+
+        view_total_cost_button.bind(
+            "<ButtonRelease-1>",
+            lambda event: BookingPage.hide_cost(
+                event,
+                cost,
+            ),
         )
 
         book_now_button = tk.Button(booking_form_frame)
@@ -438,7 +480,25 @@ class BookingPage:
         )
         rb_valv.set("Credit Card")
 
+        back = tk.Button(booking_form_frame)
+        back.place(x=1159, y=60, height=43, width=111)
+        back.config(
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 16",
+            foreground="#FFFFFF",
+            text="""Back""",
+            command=lambda: BookingPage.redirect_to_dashboard(
+                booking_form_frame,
+            ),
+        )
+
         booking_form_frame.mainloop()
+
+    @staticmethod
+    def redirect_to_dashboard(booking_form_frame):
+        booking_form_frame.destroy()
 
     @staticmethod
     def disable_card_details(
@@ -467,7 +527,11 @@ class BookingPage:
         cvv_entry.update()
 
     @staticmethod
-    def create_location_picker(booking_form_frame, location_entry):
+    def create_location_picker(
+        event,
+        booking_form_frame,
+        location_entry,
+    ):
         location_picker_frame = tk.Toplevel(booking_form_frame)
         location_picker_frame.title("Location Picker")
         location_picker_frame.resizable(0, 0)
@@ -556,8 +620,15 @@ class BookingPage:
     clicked_address = None
 
     @staticmethod
-    def location_marker(coordinates, selected_address):
-        clicked_coordinates = coordinates
+    def location_marker(
+        coordinates,
+        selected_address,
+    ):
+        if BookingPage.button_name == "pickup_button":
+            BookingPage.pickup_location_coordinates = coordinates
+        else:
+            BookingPage.destination_coordinates = coordinates
+
         clicked_coordinates_1 = coordinates[0]
         clicked_coordinates_2 = coordinates[1]
         BookingPage.clicked_address = convert_coordinates_to_address(
@@ -592,3 +663,52 @@ class BookingPage:
         )
         location_entry.config(state="readonly")
         location_picker_frame.destroy()
+
+    @staticmethod
+    def calculate_total_cost(no_of_taxi_entry, cost):
+
+        try:
+            total_cost = (
+                math.ceil(
+                    hs.haversine(
+                        BookingPage.pickup_location_coordinates,
+                        BookingPage.destination_coordinates,
+                    )
+                )
+                * 59.25
+            )
+            no_of_taxi = int(no_of_taxi_entry.get())
+
+            showCost = total_cost * no_of_taxi
+
+            finalCost = str(round(showCost, 2))
+            cost.config(text="NPR. " + finalCost)
+        except Exception as error:
+            print(error)
+            messagebox.showerror(
+                title="Invalid Data",
+                message="Location not selected",
+            )
+
+    @staticmethod
+    def button_name_finder(event):
+        BookingPage.button_name = "pickup_button"
+
+    @staticmethod
+    def button_name_finder_2(event):
+        BookingPage.button_name = "destination_button"
+
+    @staticmethod
+    def show_cost(
+        event,
+        no_of_taxi_entry,
+        cost,
+    ):
+        BookingPage.calculate_total_cost(no_of_taxi_entry, cost)
+
+    @staticmethod
+    def hide_cost(
+        event,
+        cost,
+    ):
+        cost.config(text="XXXXXX")
