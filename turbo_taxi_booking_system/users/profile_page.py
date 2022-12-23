@@ -580,6 +580,7 @@ class ProfilePage:
             command=lambda: ProfilePage.cancel(edit_bio_frame),
         )
 
+        edit_bio_frame.grab_set()
         edit_bio_frame.mainloop()
 
     @staticmethod
