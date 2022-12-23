@@ -47,7 +47,7 @@ class TaxiRegisterPage:
         brand_entry.place(
             relx=0.065,
             rely=0.29,
-            height=23,
+            height=25,
             relwidth=0.404,
         )
         brand_entry.configure(
@@ -71,7 +71,7 @@ class TaxiRegisterPage:
         model_entry.place(
             relx=0.543,
             rely=0.29,
-            height=23,
+            height=25,
             relwidth=0.404,
         )
         model_entry.configure(
@@ -88,14 +88,14 @@ class TaxiRegisterPage:
             compound="left",
             background="#FFFFFF",
             font="-family {Noto Sans} -size 14",
-            text="""Taxi_number""",
+            text="""Taxi Number""",
         )
 
         taxi_number_entry = tk.Entry(taxi_register_frame)
         taxi_number_entry.place(
             relx=0.065,
             rely=0.470,
-            height=23,
+            height=25,
             relwidth=0.404,
         )
         taxi_number_entry.configure(
@@ -119,7 +119,7 @@ class TaxiRegisterPage:
         taxi_age_entry.place(
             relx=0.543,
             rely=0.470,
-            height=23,
+            height=25,
             relwidth=0.404,
         )
         taxi_age_entry.configure(

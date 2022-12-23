@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from taxi.taxi_register import TaxiRegisterPage
+from driver.driver_register import DriverRegisterPage
 
 
 class ControlPanelPage:
@@ -30,17 +31,33 @@ class ControlPanelPage:
         line_seperator = ttk.Separator(control_panel_frame)
         line_seperator.place(relx=0.130, rely=0.123, relwidth=0.800)
 
-        register_button = tk.Button(control_panel_frame)
-        register_button.place(relx=0.850, rely=0.130, height=33, width=101)
-        register_button.configure(
+        taxi_register_button = tk.Button(control_panel_frame)
+        taxi_register_button.place(relx=0.850, rely=0.130, height=33, width=101)
+        taxi_register_button.configure(
             activebackground="beige",
             background="#007074",
             borderwidth="2",
             compound="left",
             font="-family {Noto Sans} -size 9 -weight bold",
             foreground="#FFFFFF",
-            text="""Register""",
+            text="""Taxi Register""",
             command=lambda: TaxiRegisterPage(
+                root,
+                control_panel_frame,
+            ),
+        )
+
+        driver_register_button = tk.Button(control_panel_frame)
+        driver_register_button.place(relx=0.750, rely=0.130, height=33, width=110)
+        driver_register_button.configure(
+            activebackground="beige",
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 9 -weight bold",
+            foreground="#FFFFFF",
+            text="""Driver Register""",
+            command=lambda: DriverRegisterPage(
                 root,
                 control_panel_frame,
             ),
