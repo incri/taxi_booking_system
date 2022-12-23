@@ -1,5 +1,8 @@
 from datetime import date, timedelta
-import imp
+
+from helper.exceptions import CustomException
+from .booking_model import BookingModel
+from .booking_controllers import BookingController
 import math
 from tkcalendar import DateEntry
 from tkinter import StringVar, messagebox
@@ -203,7 +206,7 @@ class BookingPage:
             text="""MM/DD/YY""",
         )
 
-        hour_entry = tk.Spinbox(booking_form_frame, from_=1.0, to=24.0)
+        hour_entry = tk.Spinbox(booking_form_frame, from_=0.0, to=23.0)
         hour_entry.place(relx=0.285, rely=0.556, relheight=0.038, relwidth=0.079)
         hour_entry.configure(
             activebackground="#f9f9f9",
@@ -213,7 +216,7 @@ class BookingPage:
             selectbackground="#c4c4c4",
         )
 
-        minute_entry = tk.Spinbox(booking_form_frame, from_=1.0, to=60.0)
+        minute_entry = tk.Spinbox(booking_form_frame, from_=0.0, to=59.0)
         minute_entry.place(relx=0.370, rely=0.556, relheight=0.038, relwidth=0.079)
         minute_entry.configure(
             activebackground="#f9f9f9",
@@ -371,6 +374,24 @@ class BookingPage:
             font="-family {Noto Sans} -size 16",
             foreground="#FFFFFF",
             text="""Book Now""",
+            command=lambda: BookingPage.user_booking_register(
+                booking_form_frame,
+                record,
+                firstname_entry,
+                lastname_entry,
+                no_of_passenger_entry,
+                no_of_taxi_entry,
+                date_entry,
+                hour_entry,
+                minute_entry,
+                pickup_address_entry,
+                destination_entry,
+                rb_valv,
+                card_number_entry,
+                exp_entry,
+                cvv_entry,
+                cost,
+            ),
         )
 
         payment_method = tk.LabelFrame(booking_form_frame)
@@ -481,12 +502,12 @@ class BookingPage:
         rb_valv.set("Credit Card")
 
         back = tk.Button(booking_form_frame)
-        back.place(x=1159, y=60, height=43, width=111)
+        back.place(x=1165, y=60, height=35, width=90)
         back.config(
             background="#007074",
             borderwidth="2",
             compound="left",
-            font="-family {Noto Sans} -size 16",
+            font="-family {Noto Sans} -size 14",
             foreground="#FFFFFF",
             text="""Back""",
             command=lambda: BookingPage.redirect_to_dashboard(
@@ -664,6 +685,8 @@ class BookingPage:
         location_entry.config(state="readonly")
         location_picker_frame.destroy()
 
+    final_cost = ""
+
     @staticmethod
     def calculate_total_cost(no_of_taxi_entry, cost):
 
@@ -681,14 +704,10 @@ class BookingPage:
 
             showCost = total_cost * no_of_taxi
 
-            finalCost = str(round(showCost, 2))
-            cost.config(text="NPR. " + finalCost)
+            BookingPage.final_cost = str(round(showCost, 2))
+            cost.config(text="NPR. " + BookingPage.final_cost)
         except Exception as error:
-            print(error)
-            messagebox.showerror(
-                title="Invalid Data",
-                message="Location not selected",
-            )
+            cost.config(text="XXXXXX")
 
     @staticmethod
     def button_name_finder(event):
@@ -712,3 +731,50 @@ class BookingPage:
         cost,
     ):
         cost.config(text="XXXXXX")
+
+    @staticmethod
+    def user_booking_register(
+        booking_form_frame,
+        record,
+        firstname_entry,
+        lastname_entry,
+        no_of_passenger_entry,
+        no_of_taxi_entry,
+        date_entry,
+        hour_entry,
+        minute_entry,
+        pickup_address_entry,
+        destination_entry,
+        rb_valv,
+        card_number_entry,
+        exp_entry,
+        cvv_entry,
+        cost,
+    ):
+        for data in record:
+            fetched_user_id = data[0]
+
+        BookingPage.calculate_total_cost(no_of_taxi_entry, cost)
+        try:
+            user_booking = BookingModel(
+                user_id=fetched_user_id,
+                firstname=firstname_entry.get(),
+                lastname=lastname_entry.get(),
+                no_of_pass=no_of_passenger_entry.get(),
+                no_of_taxi=no_of_taxi_entry.get(),
+                pick_up_date=date_entry.get(),
+                pick_up_hrs=hour_entry.get(),
+                pick_up_min=minute_entry.get(),
+                pick_up_location=pickup_address_entry.get(),
+                destination=destination_entry.get(),
+                payment_method=rb_valv.get(),
+                card_number=card_number_entry.get(),
+                exp_date=exp_entry.get(),
+                cvv=cvv_entry.get(),
+                total_cost=BookingPage.final_cost,
+            )
+            booking_control = BookingController()
+            booking_control.booking_control(user_booking, booking_form_frame)
+
+        except CustomException as e:
+            messagebox.showerror("Invalid Data", e)

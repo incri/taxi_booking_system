@@ -139,6 +139,7 @@ class LogInPage:
         )
         login_frame.mainloop()
 
+    @staticmethod
     def show_pass(
         event,
         password_entry,

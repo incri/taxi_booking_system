@@ -1,6 +1,4 @@
-import re
 from tkinter import messagebox
-from helper.exceptions import CustomException
 from helper.turbo_db import Turbo_db
 import psycopg2
 from .dashboard_page import DashboardPage

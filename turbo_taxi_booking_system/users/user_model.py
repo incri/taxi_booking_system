@@ -28,9 +28,9 @@ class UserModel(BaseModel):
     @validator("firstname", "lastname")
     def validate_first_name(cls, value):
         if not value:
-            raise CustomException(f"{value}cannot be empty")
+            raise CustomException("name cannot be empty")
         if not name_reg.match(value):
-            raise CustomException(f"invalid format for {value}")
+            raise CustomException("invalid format for name")
         return value
 
     @validator("contact")
