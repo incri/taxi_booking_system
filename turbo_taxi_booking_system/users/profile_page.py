@@ -441,7 +441,7 @@ class ProfilePage:
         )
 
         password = tk.Label(edit_bio_frame)
-        password.place(relx=0.543, rely=0.553, height=41, width=104)
+        password.place(relx=0.543, rely=0.553, height=41, width=300)
         password.configure(
             activebackground="#f9f9f9",
             anchor="w",
@@ -641,23 +641,18 @@ class ProfilePage:
 
         file = filedialog.askopenfilename()
         if file:
-            responce = messagebox.askquestion(
-                "Update",
-                "Do you really want to update? \n updating will log you out",
+            user = UserModel(
+                profile=file,
+                password=fetched_password,
+                confirm_password=fetched_password,
             )
-            if responce == "yes":
-                user = UserModel(
-                    profile=file,
-                    password=fetched_password,
-                    confirm_password=fetched_password,
-                )
-                profile_picture_control = user_controller()
-                profile_picture_control.change_profile(
-                    user,
-                    record,
-                    profile_frame,
-                    dashboaard_frame,
-                )
+            profile_picture_control = user_controller()
+            profile_picture_control.change_profile(
+                user,
+                record,
+                profile_frame,
+                dashboaard_frame,
+            )
 
     @staticmethod
     def edit_user_bio(
@@ -701,11 +696,7 @@ class ProfilePage:
         if password_entry.get() == fetched_password:
             old_password = password_entry.get()
         else:
-            messagebox.showerror(
-                "Invalid",
-                "old password not matched!!",
-                parent=edit_bio_frame,
-            )
+            old_password = password_entry.get()
 
         try:
             user = UserModel(
@@ -716,22 +707,14 @@ class ProfilePage:
                 confirm_password=old_password,
                 new_password=new_password_update,
             )
-            responce = messagebox.askquestion(
-                "Update",
-                "Do you really want to update? \n updating will log you out",
-                parent=edit_bio_frame,
+            user_bio_control = user_controller()
+            user_bio_control.update_user_bio(
+                user,
+                record,
+                edit_bio_frame,
+                profile_frame,
+                dashboard_frame,
             )
-            if responce == "yes":
-                user_bio_control = user_controller()
-                user_bio_control.update_user_bio(
-                    user,
-                    record,
-                    edit_bio_frame,
-                    profile_frame,
-                    dashboard_frame,
-                )
-            else:
-                edit_bio_frame.destroy()
 
         except CustomException as e:
             messagebox.showerror("Invalid Data", e, parent=edit_bio_frame)

@@ -164,13 +164,15 @@ class LogInPage:
         login_frame,
         root,
     ):
+
         try:
             user = UserModel(
                 username=username_entry.get(),
                 password=password_entry.get(),
                 confirm_password=password_entry.get(),
             )
+            login_frame.destroy()
             user_control = UserController()
-            user_control.login_control(user, login_frame, root)
+            user_control.login_control(user, root)
         except CustomException as e:
             messagebox.showerror("Invalid Data", e)

@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 from io import BytesIO
 from .profile_page import ProfilePage
 from bookings.booking_form import BookingPage
+from .user_model import UserModel
 
 
 class DashboardPage:
@@ -110,6 +111,23 @@ class DashboardPage:
             ),
         )
 
+        refresh_button = tk.Button(dashboard_frame)
+        refresh_button.place(relx=0.799, rely=0.814, height=33, width=131)
+        refresh_button.configure(
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            text="Refresh Page",
+            font="-family {Noto Sans} -size 12 -weight bold",
+            foreground="#FFFFFF",
+            command=lambda: DashboardPage.refresh_page(
+                user_controller,
+                record,
+                root,
+                dashboard_frame,
+            ),
+        )
+
         dashboard_frame.mainloop()
 
     @staticmethod
@@ -132,3 +150,19 @@ class DashboardPage:
             dashboard_frame,
             record,
         )
+
+    @staticmethod
+    def refresh_page(user_controller, record, root, dashboard_frame):
+
+        dashboard_frame.destroy()
+        for data in record:
+            fetched_username = data[6]
+            fetched_password = data[7]
+
+        user = UserModel(
+            username=fetched_username,
+            password=fetched_password,
+            confirm_password=fetched_password,
+        )
+        user_control = user_controller()
+        user_control.login_control(user, root)

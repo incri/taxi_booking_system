@@ -76,9 +76,9 @@ class UserController:
         )
         signup_frame.destroy()
 
-    def login_control(self, user, login_frame, root):
+    def login_control(self, user, root):
         if self.login_authenticate(user):
-            self.login_sucess(root, login_frame)
+            self.login_sucess(root)
         else:
             messagebox.showerror("Invalid Data", "username or password not matched")
 
@@ -99,12 +99,7 @@ class UserController:
             return True
         return False
 
-    def login_sucess(self, root, login_page):
-        messagebox.showinfo(
-            title="Congratulation",
-            message="Welcome " + self.fetched_firstname + " " + self.fetched_lastname,
-        )
-        login_page.destroy(),
+    def login_sucess(self, root):
         DashboardPage(
             root,
             self.record,
@@ -174,8 +169,8 @@ class UserController:
                 "Profile Picture Changed !",
             )
 
-            profile_frame.destroy()
-            dashboard_frame.destroy()
+            # profile_frame.destroy()
+            # dashboard_frame.destroy()
 
         except Exception as e:
             print(e)
@@ -221,8 +216,6 @@ class UserController:
             )
 
             edit_bio_frame.destroy()
-            profile_frame.destroy()
-            dashboard_frame.destroy()
 
         except Exception as error:
             if "username" in str(error):
