@@ -1,5 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
+
+from helper.exceptions import CustomException
+from .taxi_model import TaxiModel
+from .taxi_register_controller import TaxiController
 
 
 class TaxiRegisterPage:
@@ -43,7 +48,21 @@ class TaxiRegisterPage:
             text="""Brand""",
         )
 
-        brand_entry = tk.Entry(taxi_register_frame)
+        list_of_brand = [
+            "Hyundai",
+            "Maruti",
+            "Honda",
+        ]
+
+        selected_brand = tk.StringVar()
+        selected_model = tk.StringVar()
+        selected_age = tk.StringVar()
+
+        brand_entry = ttk.Combobox(
+            taxi_register_frame,
+            textvariable=selected_brand,
+            values=list_of_brand,
+        )
         brand_entry.place(
             relx=0.065,
             rely=0.29,
@@ -53,7 +72,15 @@ class TaxiRegisterPage:
         brand_entry.configure(
             background="#EFF0F2",
             font="TkFixedFont",
-            selectbackground="#c4c4c4",
+            state="readonly",
+        )
+        brand_entry.bind(
+            "<<ComboboxSelected>>",
+            lambda event: TaxiRegisterPage.model_viewer(
+                event,
+                model_entry,
+                selected_brand,
+            ),
         )
 
         model_user = tk.Label(taxi_register_frame)
@@ -67,7 +94,11 @@ class TaxiRegisterPage:
             text="""Model""",
         )
 
-        model_entry = tk.Entry(taxi_register_frame)
+        model_entry = ttk.Combobox(
+            taxi_register_frame,
+            textvariable=selected_model,
+            state="readonly",
+        )
         model_entry.place(
             relx=0.543,
             rely=0.29,
@@ -77,7 +108,6 @@ class TaxiRegisterPage:
         model_entry.configure(
             background="#EFF0F2",
             font="TkFixedFont",
-            selectbackground="#c4c4c4",
         )
 
         taxi_number_label = tk.Label(taxi_register_frame)
@@ -115,7 +145,13 @@ class TaxiRegisterPage:
             text="""Age""",
         )
 
-        taxi_age_entry = tk.Entry(taxi_register_frame)
+        taxi_age_entry = tk.Spinbox(
+            taxi_register_frame,
+            from_=1.0,
+            to=9.0,
+            state="readonly",
+            textvariable=selected_age,
+        )
         taxi_age_entry.place(
             relx=0.543,
             rely=0.470,
@@ -161,6 +197,14 @@ class TaxiRegisterPage:
             font="-family {Noto Sans} -size 12",
             foreground="#FFFFFF",
             text="""Register""",
+            command=lambda: TaxiRegisterPage.taxi_registration(
+                taxi_register_frame,
+                selected_brand,
+                selected_model,
+                taxi_number_entry,
+                selected_age,
+                discription_entry,
+            ),
         )
 
         cancel_button = tk.Button(taxi_register_frame)
@@ -173,7 +217,68 @@ class TaxiRegisterPage:
             font="-family {Noto Sans} -size 12",
             foreground="#FFFFFF",
             text="""Cancel""",
+            command=lambda: TaxiRegisterPage.exit_taxi_registration(
+                taxi_register_frame,
+            ),
         )
 
         taxi_register_frame.grab_set()
         taxi_register_frame.mainloop()
+
+    @staticmethod
+    def model_viewer(event, model_entry, selected_brand):
+
+        hyundai_model = ["Grand i10 NIOS", "Aura", "Venue"]
+        maruti_model = ["Swift dzire", "Eeco", "Ritz"]
+        Honda_model = ["Amaze V", "city E", "mobilio s"]
+
+        if selected_brand.get() == "Hyundai":
+            model_entry["values"] = hyundai_model
+            model_entry.current(0)
+            model_entry.update()
+        if selected_brand.get() == "Maruti":
+            model_entry["values"] = maruti_model
+            model_entry.current(0)
+            model_entry.update()
+        if selected_brand.get() == "Honda":
+            model_entry["values"] = Honda_model
+            model_entry.current(0)
+            model_entry.update()
+
+    @staticmethod
+    def exit_taxi_registration(taxi_register_frame):
+        taxi_register_frame.destroy()
+
+    @staticmethod
+    def taxi_registration(
+        taxi_register_frame,
+        selected_brand,
+        selected_model,
+        taxi_number_entry,
+        selected_age,
+        discription_entry,
+    ):
+        try:
+            taxi = TaxiModel(
+                brand=selected_brand.get(),
+                model=selected_model.get(),
+                taxi_number=taxi_number_entry.get(),
+                taxi_age=(selected_age.get()),
+                discription=discription_entry.get("1.0", "end"),
+            )
+
+            taxi_number_entry.delete("0", "end")
+            discription_entry.delete("1.0", "end")
+
+            taxi_controller = TaxiController()
+            taxi_controller.taxi_registration_control(
+                taxi,
+                taxi_register_frame,
+            )
+
+        except CustomException as error:
+            messagebox.showerror(
+                "Invalid Data",
+                error,
+                parent=taxi_register_frame,
+            )
