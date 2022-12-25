@@ -5,6 +5,7 @@ from helper.turbo_db import Turbo_db
 class TaxiController:
     def __init__(self) -> None:
         self._connection = Turbo_db.turbo_connection()
+        self.taxi_number = None
 
     def taxi_registration_control(self, taxi, taxi_register_frame):
         if self.authenticate(taxi, taxi_register_frame):
@@ -19,12 +20,13 @@ class TaxiController:
                 model    VARCHAR(50) NOT NULL,
                 taxi_number VARCHAR(20) NOT NULL UNIQUE,
                 taxi_age VARCHAR(50) NOT NULL,
-                discription   VARCHAR(50) NOT NULL
+                discription   VARCHAR(50) NOT NULL ,
+                status  VARCHAR(40)
                 
             );"""
 
             data_insert = """INSERT INTO taxi(brand, model, taxi_number, 
-            taxi_age, discription) VALUES (%s, %s, %s, %s, %s);
+            taxi_age, discription,status) VALUES (%s, %s, %s, %s, %s, %s);
             """
             data_values = (
                 taxi.brand,
@@ -32,8 +34,8 @@ class TaxiController:
                 taxi.taxi_number,
                 taxi.taxi_age,
                 taxi.discription,
+                "Available",
             )
-            print(taxi.taxi_age)
             cursor.execute(statement)
             cursor.execute(data_insert, data_values)
             self._connection.commit()
@@ -45,6 +47,7 @@ class TaxiController:
                 "taxi number already exits",
                 parent=taxi_register_frame,
             )
+            print(error)
         finally:
             if cursor is not None:
                 cursor.close()
@@ -57,3 +60,54 @@ class TaxiController:
             "taxi register",
             parent=taxi_register_frame,
         )
+
+    @staticmethod
+    def taxi_number_fetcher(taxi_number_entry):
+        _connection = Turbo_db.turbo_connection()
+        try:
+            cursor = _connection.cursor()
+            statement = "SELECT taxi_number FROM taxi WHERE status='Available';"
+            cursor.execute(statement)
+            taxi_number = cursor.fetchall()
+            taxi_number_entry["values"] = taxi_number
+            taxi_number_entry.update()
+
+        except Exception as error:
+            print(error)
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if _connection is not None:
+                _connection.close()
+
+    @staticmethod
+    def taxi_data_fetcher(
+        welcome,
+        taxi_number_data,
+        taxi_age_data,
+        taxi_discription_data,
+        selected_taxi_number,
+    ):
+        _connection = Turbo_db.turbo_connection()
+        try:
+            cursor = _connection.cursor()
+            statement = "SELECT * FROM taxi WHERE taxi_number=%s;"
+            data = selected_taxi_number.get()
+            cursor.execute(statement, data)
+            taxi_data = cursor.fetchall()
+
+            for data in taxi_data:
+                fetched_car_name = data[0]
+
+            print(fetched_car_name)
+
+            welcome.config(text=fetched_car_name)
+            welcome.update()
+
+        except Exception as error:
+            print(error)
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if _connection is not None:
+                _connection.close()
