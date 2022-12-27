@@ -5,7 +5,6 @@ from helper.turbo_db import Turbo_db
 class TaxiController:
     def __init__(self) -> None:
         self._connection = Turbo_db.turbo_connection()
-        self.taxi_number = None
 
     def taxi_registration_control(self, taxi, taxi_register_frame):
         if self.authenticate(taxi, taxi_register_frame):
@@ -90,19 +89,31 @@ class TaxiController:
     ):
         _connection = Turbo_db.turbo_connection()
         try:
+
             cursor = _connection.cursor()
             statement = "SELECT * FROM taxi WHERE taxi_number=%s;"
-            data = selected_taxi_number.get()
+            data = (selected_taxi_number.get(),)
+
             cursor.execute(statement, data)
             taxi_data = cursor.fetchall()
+            if taxi_data:
+                for data in taxi_data:
+                    fetched_car_brand = data[1]
+                    fetched_car_model = data[2]
+                    fetched_car_number = data[3]
+                    fetched_car_age = data[4]
+                    fetched_car_discription = data[5]
+            else:
+                return False
 
-            for data in taxi_data:
-                fetched_car_name = data[0]
-
-            print(fetched_car_name)
-
-            welcome.config(text=fetched_car_name)
+            welcome.config(text=fetched_car_brand + " " + fetched_car_model)
+            taxi_number_data.config(text=fetched_car_number)
+            taxi_age_data.config(text=fetched_car_age)
+            taxi_discription_data.config(text=fetched_car_discription)
             welcome.update()
+            taxi_number_data.update()
+            taxi_number_data.update()
+            taxi_discription_data.update()
 
         except Exception as error:
             print(error)

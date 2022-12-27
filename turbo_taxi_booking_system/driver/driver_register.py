@@ -1,6 +1,10 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
+from helper.exceptions import CustomException
 from taxi.taxi_register_controller import TaxiController
+from .driver_model import DriverModel
+from .driver_controller import DriverController
 
 
 class DriverRegisterPage:
@@ -154,6 +158,13 @@ class DriverRegisterPage:
             font="-family {Noto Sans} -size 12 -weight bold",
             foreground="#FFFFFF",
             text="""Register""",
+            command=lambda: DriverRegisterPage.driver_registration(
+                driver_register_frame,
+                fullname_entry,
+                license_entry,
+                contact_entry,
+                selected_taxi_number,
+            ),
         )
 
         cancel_button = tk.Button(driver_register_frame)
@@ -166,6 +177,9 @@ class DriverRegisterPage:
             font="-family {Noto Sans} -size 12",
             foreground="#FFFFFF",
             text="""Cancel""",
+            command=lambda: DriverRegisterPage.cancel_button(
+                driver_register_frame,
+            ),
         )
         driver_register_frame.grab_set()
         driver_register_frame.mainloop()
@@ -178,6 +192,7 @@ class DriverRegisterPage:
         selected_taxi_number,
     ):
         TaxiController.taxi_number_fetcher(taxi_number_entry)
+
         DriverRegisterPage.taxi_detail_viewer(
             driver_register_frame,
             selected_taxi_number,
@@ -201,15 +216,15 @@ class DriverRegisterPage:
             relief="solid",
             highlightbackground="#000000",
         )
+
         welcome = tk.Label(driver_register_frame)
-        welcome.place(relx=0.310, rely=0.10, height=41, width=250)
+        welcome.place(relx=0.065, rely=0.10, height=41, width=365)
         welcome.configure(
-            activebackground="#f9f9f9",
-            anchor="w",
             background="#FFFFFF",
             compound="left",
             text="""Driver Register""",
             font="-family {Noto Sans} -size 14 -weight bold",
+            anchor="center",
         )
 
         taxi_number = tk.Label(driver_register_frame)
@@ -219,7 +234,7 @@ class DriverRegisterPage:
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
+            background="#FFFFFF",
             text="""Taxi Number :""",
         )
 
@@ -230,8 +245,7 @@ class DriverRegisterPage:
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
-            text="xxxxxxx",
+            background="#FFFFFF",
         )
 
         taxi_age = tk.Label(driver_register_frame)
@@ -241,7 +255,7 @@ class DriverRegisterPage:
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
+            background="#FFFFFF",
             text="""Taxi Age :""",
         )
 
@@ -252,8 +266,7 @@ class DriverRegisterPage:
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
-            text="""x""",
+            background="#FFFFFF",
         )
 
         taxi_discription = tk.Label(driver_register_frame)
@@ -263,18 +276,17 @@ class DriverRegisterPage:
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
+            background="#FFFFFF",
             text="""Discription :""",
         )
         taxi_discription_data = tk.Label(driver_register_frame)
-        taxi_discription_data.place(relx=0.360, rely=0.65, height=41, width=250)
+        taxi_discription_data.place(relx=0.360, rely=0.70, height=41, width=250)
         taxi_discription_data.configure(
             activebackground="#f9f9f9",
             anchor="w",
             font="-family {Noto Sans} -size 12",
             compound="left",
-            background="#f9f9f9",
-            text="""xxxxxxxxxx""",
+            background="#FFFFFF",
         )
 
         DriverRegisterPage.taxi_data_fetcher(
@@ -300,3 +312,32 @@ class DriverRegisterPage:
             taxi_discription_data,
             selected_taxi_number,
         )
+
+    @staticmethod
+    def cancel_button(driver_register_frame):
+        driver_register_frame.destroy()
+
+    @staticmethod
+    def driver_registration(
+        driver_register_frame,
+        fullname_entry,
+        license_entry,
+        contact_entry,
+        selected_taxi_number,
+    ):
+        try:
+            driver = DriverModel(
+                fullname=fullname_entry.get(),
+                license_number=license_entry.get(),
+                contact=contact_entry.get(),
+                taxi_number=selected_taxi_number.get(),
+            )
+
+            driver_control = DriverController()
+            driver_control.driver_registration_control(
+                driver,
+                driver_register_frame,
+            )
+
+        except CustomException as error:
+            messagebox.showerror("invalid", error, parent=driver_register_frame)
