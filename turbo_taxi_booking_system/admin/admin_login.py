@@ -131,6 +131,7 @@ class LogInPage:
                 password_entry,
             ),
         )
+
         login_frame.mainloop()
 
     @staticmethod

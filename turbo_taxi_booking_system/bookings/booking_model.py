@@ -38,10 +38,16 @@ class BookingModel(BaseModel):
     def validate_time(cls, value):
         pick_up_hrs = value.get("pick_up_hrs")
         pick_up_min = value.get("pick_up_min")
-        if pick_up_hrs == "":
+        if pick_up_hrs == "" and pick_up_hrs:
             raise CustomException("time(Hour) cannot be empty")
         if pick_up_min == "":
             raise CustomException("time(Minutes) cannot be empty")
+
+        if pick_up_hrs == str:
+            raise CustomException("time(Hour) invalid")
+        if pick_up_min == str:
+            raise CustomException("time(Minutes) invalid")
+
         if pick_up_hrs >= 24:
             raise CustomException("time(Hour) invalid")
         if pick_up_min >= 60:

@@ -17,16 +17,30 @@ class AdminController:
             )
 
     def login_authenticate(self, admin):
-        cursor = self._connection.cursor()
-        statement = "SELECT * FROM admin WHERE username=%s AND password = %s;"
-        data = (admin.username, admin.password)
-        cursor.execute(statement, data)
-        self.record = cursor.fetchall()
-        if self.record:
-            return True
-        return False
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM admin WHERE username=%s AND password = %s;"
+            data = (admin.username, admin.password)
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            if self.record:
+                return True
+            return False
+        except Exception as error:
+            print(error)
 
     def login_sucess(self, root, login_page):
         messagebox.showinfo(title="Congratulation", message="Welcome ")
         login_page.destroy()
-        ControlPanelPage(root, login_page)
+        ControlPanelPage(root, login_page, AdminController)
+
+    def customer_data_fetcher(self):
+
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT u.userid, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id;"
+            cursor.execute(statement)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)

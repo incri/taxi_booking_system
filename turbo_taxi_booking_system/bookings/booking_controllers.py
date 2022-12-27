@@ -17,7 +17,7 @@ class BookingController:
             cursor = self._connection.cursor()
             statement = """CREATE TABLE IF NOT EXISTS booking(
                 booking_id          SERIAL PRIMARY KEY,
-                user_id             VARCHAR(10) NOT NULL,
+                user_id             INT NOT NULL,
                 firstname           VARCHAR(50) NOT NULL,
                 lastname            VARCHAR(50) NOT NULL,
                 no_of_passenger     VARCHAR(10) NOT NULL,
@@ -31,15 +31,16 @@ class BookingController:
                 payment_method      VARCHAR(20) NOT NULL,
                 card_number         VARCHAR(50),
                 card_exp            VARCHAR(20),
-                card_cvv            VARCHAR(10)          
+                card_cvv            VARCHAR(10),
+                booking_status      VARCHAR(20)          
 
             );"""
 
             dataInsert = """INSERT INTO booking(user_id, firstname, lastname, \
                 no_of_passenger, no_of_taxi, pickup_date, pickup_time_hrs, \
                 pickup_time_min, pickup_location, destination, total_cost, \
-                payment_method, card_number, card_exp, card_cvv) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                payment_method, card_number, card_exp, card_cvv, booking_status) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
 
             dataValues = (
                 user_booking.user_id,
@@ -57,6 +58,7 @@ class BookingController:
                 user_booking.card_number,
                 user_booking.exp_date,
                 user_booking.cvv,
+                "Pending",
             )
             cursor.execute(statement)
             cursor.execute(dataInsert, dataValues)
