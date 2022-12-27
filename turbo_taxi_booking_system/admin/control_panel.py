@@ -67,23 +67,44 @@ class ControlPanelPage:
             ),
         )
 
+        customer_table_button = tk.Button(control_panel_frame)
+        customer_table_button.place(relx=0.130, rely=0.850, height=33, width=101)
+        customer_table_button.configure(
+            activebackground="beige",
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 9 -weight bold",
+            foreground="#FFFFFF",
+            text="""Customer""",
+            command=lambda: ControlPanelPage.customer_tabel_data_fetcher(
+                admin_controller, control_panel_frame
+            ),
+        )
+
+        driver_table_button = tk.Button(control_panel_frame)
+        driver_table_button.place(relx=0.220, rely=0.850, height=33, width=101)
+        driver_table_button.configure(
+            activebackground="beige",
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 9 -weight bold",
+            foreground="#FFFFFF",
+            text="""Driver""",
+        )
+
         ControlPanelPage.customer_tabel_data_fetcher(
             admin_controller, control_panel_frame
         )
-
         control_panel_frame.mainloop()
 
     @staticmethod
-    def customer_tabel_data_fetcher(admin_controller, control_panel_frame):
-        user_booking = admin_controller()
-        required_customer_data = user_booking.customer_data_fetcher()
-
-        ControlPanelPage.customer_table_frame_build(
-            required_customer_data, control_panel_frame
-        )
-
-    @staticmethod
-    def customer_table_frame_build(record, control_panel_frame):
+    def customer_table_frame_build(
+        record,
+        control_panel_frame,
+        admin_controller,
+    ):
 
         customer_table_frame = tk.Frame(control_panel_frame)
 
@@ -110,6 +131,61 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             text="""Customer Table""",
         )
+
+        search_entry = tk.Entry(customer_table_frame)
+        search_entry.place(relx=0.200, rely=0.050, height=25, relwidth=0.150)
+        search_entry.configure(
+            background="#EFF0F2", font="TkFixedFont", selectbackground="#c4c4c4"
+        )
+
+        search_button = tk.Button(customer_table_frame)
+        search_button.place(relx=0.360, rely=0.050, height=25, relwidth=0.069)
+        search_button.configure(
+            activebackground="beige",
+            borderwidth="1",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            text="""Search""",
+            command=lambda: ControlPanelPage.customer_tabel_search_fetcher(
+                admin_controller,
+                control_panel_frame,
+                search_entry,
+                selected_sort_by,
+            ),
+        )
+
+        selected_sort_by = tk.StringVar()
+
+        sort_by_combo = ttk.Combobox(
+            customer_table_frame,
+            textvariable=selected_sort_by,
+            state="readonly",
+            values=("Date", "Full Name", "Booking ID", "User ID"),
+        )
+
+        sort_by_combo.place(relx=0.460, rely=0.050, height=25, relwidth=0.150)
+
+        if record[1] == "1":
+            sort_by_combo.current(0)
+        else:
+            if record[1] == "2":
+                sort_by_combo.current(1)
+            else:
+                if record[1] == "3":
+                    sort_by_combo.current(2)
+                else:
+                    if record[1] == "4":
+                        sort_by_combo.current(3)
+
+        sort_by_combo.bind(
+            "<<ComboboxSelected>>",
+            lambda event: ControlPanelPage.customer_tabel_search_fetcher(
+                admin_controller,
+                control_panel_frame,
+                search_entry,
+                selected_sort_by,
+            ),
+        ),
 
         # CUSTOMISING TABLE LOOK
         table_style = ttk.Style()
@@ -187,7 +263,7 @@ class ControlPanelPage:
             "Booking Status", text="Booking Status", anchor=W
         )
 
-        for data in record:
+        for data in record[0]:
             customer_booking_table.insert(
                 parent="",
                 index="end",
@@ -203,3 +279,33 @@ class ControlPanelPage:
                     data[7],
                 ),
             )
+
+        customer_table_frame.mainloop()
+
+    @staticmethod
+    def customer_tabel_data_fetcher(admin_controller, control_panel_frame):
+        user_booking = admin_controller()
+        required_customer_data = user_booking.customer_data_fetcher()
+
+        ControlPanelPage.customer_table_frame_build(
+            required_customer_data,
+            control_panel_frame,
+            admin_controller,
+        )
+
+    @staticmethod
+    def customer_tabel_search_fetcher(
+        admin_controller,
+        control_panel_frame,
+        search_entry,
+        selected_sort_by,
+    ):
+        user_booking = admin_controller()
+        required_customer_search = user_booking.customer_search_fetcher(
+            search_entry,
+            selected_sort_by,
+        )
+
+        ControlPanelPage.customer_table_frame_build(
+            required_customer_search, control_panel_frame, admin_controller
+        )
