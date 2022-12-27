@@ -1,7 +1,6 @@
 from tkinter import messagebox
-from xml.dom.expatbuilder import parseString
 from helper.turbo_db import Turbo_db
-import psycopg2
+from datetime import date, datetime
 
 
 class BookingController:
@@ -13,6 +12,11 @@ class BookingController:
             self.booking_sucess(booking_form_frame)
 
     def authenticate_booking(self, user_booking):
+
+        booking_created_at_date = date.today()
+        now = datetime.now()
+        booking_created_at_time = now.strftime("%H:%M:%S")
+
         try:
             cursor = self._connection.cursor()
             statement = """CREATE TABLE IF NOT EXISTS booking(
@@ -32,15 +36,18 @@ class BookingController:
                 card_number         VARCHAR(50),
                 card_exp            VARCHAR(20),
                 card_cvv            VARCHAR(10),
-                booking_status      VARCHAR(20)          
+                booking_status      VARCHAR(20),
+                created_at_date     VARCHAR(30),
+                created_at_time     VARCHAR(30)
+
 
             );"""
 
             dataInsert = """INSERT INTO booking(user_id, firstname, lastname, \
                 no_of_passenger, no_of_taxi, pickup_date, pickup_time_hrs, \
                 pickup_time_min, pickup_location, destination, total_cost, \
-                payment_method, card_number, card_exp, card_cvv, booking_status) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                payment_method, card_number, card_exp, card_cvv, booking_status, created_at_date, created_at_time) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
 
             dataValues = (
                 user_booking.user_id,
@@ -59,6 +66,8 @@ class BookingController:
                 user_booking.exp_date,
                 user_booking.cvv,
                 "Pending",
+                booking_created_at_date,
+                booking_created_at_time,
             )
             cursor.execute(statement)
             cursor.execute(dataInsert, dataValues)

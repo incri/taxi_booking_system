@@ -152,6 +152,8 @@ class ControlPanelPage:
 
         customer_booking_table["columns"] = (
             "User ID",
+            "Booking ID",
+            "Created At",
             "Full Name",
             "Contact",
             "Address",
@@ -163,16 +165,20 @@ class ControlPanelPage:
 
         customer_booking_table.column("#0", width=0, stretch=NO)
         customer_booking_table.column("User ID", width=70, anchor=W)
+        customer_booking_table.column("Booking ID", width=70, anchor=W)
+        customer_booking_table.column("Created At", width=120, anchor=W)
         customer_booking_table.column("Full Name", width=140, anchor=W)
         customer_booking_table.column("Contact", width=70, anchor=W)
         customer_booking_table.column("Address", width=170, anchor=W)
-        customer_booking_table.column("Email", width=220, anchor=W)
+        customer_booking_table.column("Email", width=180, anchor=W)
         customer_booking_table.column("Booking Status", width=100, anchor=W)
 
         # Create Heading
 
         customer_booking_table.heading("#0", text="", anchor=W)
         customer_booking_table.heading("User ID", text="User ID", anchor=W)
+        customer_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
+        customer_booking_table.heading("Created At", text="Created At", anchor=W)
         customer_booking_table.heading("Full Name", text="Full Name", anchor=W)
         customer_booking_table.heading("Contact", text="Contact", anchor=W)
         customer_booking_table.heading("Address", text="Address", anchor=W)
@@ -193,5 +199,7 @@ class ControlPanelPage:
                     data[3],
                     data[4],
                     data[5],
+                    data[6],
+                    data[7],
                 ),
             )

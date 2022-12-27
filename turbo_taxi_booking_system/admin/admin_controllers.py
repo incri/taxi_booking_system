@@ -38,7 +38,7 @@ class AdminController:
 
         try:
             cursor = self._connection.cursor()
-            statement = "SELECT u.userid, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id;"
+            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id order by b.created_at_date, b.created_at_time;"
             cursor.execute(statement)
             self.record = cursor.fetchall()
             return self.record
