@@ -22,19 +22,20 @@ class DriverController:
                 fullname   VARCHAR(50) NOT NULL,
                 license_number    VARCHAR(50) NOT NULL,
                 contact VARCHAR(20) NOT NULL,
-                taxi_number VARCHAR(50) NOT NULL
-               
+                taxi_number VARCHAR(50) NOT NULL,
+                driver_status   VARCHAR(50) NOT NULL
                 
             );"""
 
             data_insert = """INSERT INTO drivers(fullname, license_number,
-            contact, taxi_number) VALUES (%s, %s, %s, %s);
+            contact, taxi_number, driver_status) VALUES (%s, %s, %s, %s, %s);
             """
             data_values = (
                 driver.fullname,
                 driver.license_number,
                 driver.contact,
                 driver.taxi_number,
+                "Available",
             )
 
             cursor.execute(statement)

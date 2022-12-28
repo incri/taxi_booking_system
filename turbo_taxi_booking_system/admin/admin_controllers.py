@@ -73,3 +73,38 @@ class AdminController:
             return self.record
         except Exception as error:
             print(error)
+
+    def driver_data_fetcher(self):
+
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM drivers;"
+            cursor.execute(statement)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def driver_search_fetcher(self, search_entry, selected_sort_by):
+
+        if selected_sort_by.get() == "Driver ID":
+            statement = "SELECT * FROM drivers WHERE fullname like concat('%%',%s,'%%') ORDER BY driverid;"
+        else:
+            if selected_sort_by.get() == "Full Name":
+                statement = "SELECT * FROM drivers WHERE fullname like concat('%%',%s,'%%') ORDER BY fullname;"
+            else:
+                if selected_sort_by.get() == "Available":
+                    statement = "SELECT * FROM drivers WHERE fullname like concat('%%',%s,'%%') and driver_status = 'Available' ORDER BY driverid;"
+                else:
+                    if selected_sort_by.get() == "Booked":
+                        statement = "SELECT * FROM drivers WHERE fullname like concat('%%',%s,'%%') and driver_status = 'Booked' ORDER BY driverid;"
+                    else:
+                        return
+        try:
+            cursor = self._connection.cursor()
+            data = (search_entry.get(),)
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
