@@ -92,6 +92,9 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 9 -weight bold",
             foreground="#FFFFFF",
             text="""Driver""",
+            command=lambda: ControlPanelPage.driver_table_frame_build(
+                control_panel_frame,
+            ),
         )
 
         ControlPanelPage.customer_tabel_data_fetcher(
@@ -148,9 +151,9 @@ class ControlPanelPage:
             text="""Search""",
             command=lambda: ControlPanelPage.customer_tabel_search_fetcher(
                 admin_controller,
-                control_panel_frame,
                 search_entry,
                 selected_sort_by,
+                customer_table_frame,
             ),
         )
 
@@ -164,28 +167,108 @@ class ControlPanelPage:
         )
 
         sort_by_combo.place(relx=0.460, rely=0.050, height=25, relwidth=0.150)
-
-        if record[1] == "1":
-            sort_by_combo.current(0)
-        else:
-            if record[1] == "2":
-                sort_by_combo.current(1)
-            else:
-                if record[1] == "3":
-                    sort_by_combo.current(2)
-                else:
-                    if record[1] == "4":
-                        sort_by_combo.current(3)
+        sort_by_combo.current(0)
 
         sort_by_combo.bind(
             "<<ComboboxSelected>>",
             lambda event: ControlPanelPage.customer_tabel_search_fetcher(
                 admin_controller,
-                control_panel_frame,
                 search_entry,
                 selected_sort_by,
+                customer_table_frame,
             ),
         ),
+
+        sort_by_label = tk.Label(
+            customer_table_frame,
+            text=": sort by",
+            anchor=W,
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+        )
+
+        sort_by_label.place(
+            relx=0.620,
+            rely=0.050,
+            height=25,
+            relwidth=0.060,
+        )
+
+        ControlPanelPage.customer_table_build(customer_table_frame, record)
+
+    @staticmethod
+    def driver_table_frame_build(control_panel_frame):
+        driver_table_frame = tk.Frame(control_panel_frame)
+
+        driver_table_frame.place(
+            relx=0.130,
+            rely=0.200,
+            height=470,
+            width=1095,
+        )
+
+        driver_table_frame.config(
+            background="#FFFFFF",
+            borderwidth=2,
+            relief="solid",
+            highlightbackground="#000000",
+        )
+
+        table_title = tk.Label(driver_table_frame)
+        table_title.place(relx=0.020, rely=0.010, height=60, width=200)
+        table_title.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            text="""Driver Table""",
+        )
+
+        search_entry = tk.Entry(driver_table_frame)
+        search_entry.place(relx=0.200, rely=0.050, height=25, relwidth=0.150)
+        search_entry.configure(
+            background="#EFF0F2", font="TkFixedFont", selectbackground="#c4c4c4"
+        )
+
+        search_button = tk.Button(driver_table_frame)
+        search_button.place(relx=0.360, rely=0.050, height=25, relwidth=0.069)
+        search_button.configure(
+            activebackground="beige",
+            borderwidth="1",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            text="""Search""",
+        )
+
+        selected_sort_by = tk.StringVar()
+
+        sort_by_combo = ttk.Combobox(
+            driver_table_frame,
+            textvariable=selected_sort_by,
+            state="readonly",
+            values=("Date", "Full Name", "Booking ID", "User ID"),
+        )
+
+        sort_by_combo.place(relx=0.460, rely=0.050, height=25, relwidth=0.150)
+        sort_by_combo.current(0)
+
+        sort_by_label = tk.Label(
+            driver_table_frame,
+            text=": sort by",
+            anchor=W,
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+        )
+
+        sort_by_label.place(
+            relx=0.620,
+            rely=0.050,
+            height=25,
+            relwidth=0.060,
+        )
+
+    @staticmethod
+    def customer_table_build(customer_table_frame, record):
 
         # CUSTOMISING TABLE LOOK
         table_style = ttk.Style()
@@ -263,7 +346,7 @@ class ControlPanelPage:
             "Booking Status", text="Booking Status", anchor=W
         )
 
-        for data in record[0]:
+        for data in record:
             customer_booking_table.insert(
                 parent="",
                 index="end",
@@ -296,9 +379,9 @@ class ControlPanelPage:
     @staticmethod
     def customer_tabel_search_fetcher(
         admin_controller,
-        control_panel_frame,
         search_entry,
         selected_sort_by,
+        customer_table_frame,
     ):
         user_booking = admin_controller()
         required_customer_search = user_booking.customer_search_fetcher(
@@ -306,6 +389,7 @@ class ControlPanelPage:
             selected_sort_by,
         )
 
-        ControlPanelPage.customer_table_frame_build(
-            required_customer_search, control_panel_frame, admin_controller
+        ControlPanelPage.customer_table_build(
+            customer_table_frame,
+            required_customer_search,
         )

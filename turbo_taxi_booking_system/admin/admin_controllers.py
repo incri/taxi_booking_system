@@ -41,8 +41,7 @@ class AdminController:
             statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id order by b.created_at_date, b.created_at_time;"
             cursor.execute(statement)
             self.record = cursor.fetchall()
-            selected = 1
-            return self.record, selected
+            return self.record
         except Exception as error:
             print(error)
 
@@ -50,30 +49,27 @@ class AdminController:
 
         if selected_sort_by.get() == "Date":
             statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, b.created_at_time;"
-            selected = "1"
         else:
             if selected_sort_by.get() == "Full Name":
                 statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by u.firstname;"
-                selected = "2"
+
             else:
                 if selected_sort_by.get() == "User ID":
                     statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, u.userid;"
-                    selected = "4"
 
                 else:
                     if selected_sort_by.get() == "Booking ID":
                         statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.booking_id;"
-                        selected = "3"
+
                     else:
                         if selected_sort_by.get() == "":
                             statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, b.created_at_time;"
-                            selected = "1"
 
         try:
             cursor = self._connection.cursor()
             data = (search_entry.get(),)
             cursor.execute(statement, data)
             self.record = cursor.fetchall()
-            return self.record, selected
+            return self.record
         except Exception as error:
             print(error)
