@@ -25,6 +25,8 @@ class BookingModel(BaseModel):
     card_number: str = ""
     exp_date: str = ""
     cvv: str = ""
+    pickup_coordinates: str = ""
+    destination_coordinates: str = ""
 
     @validator("firstname", "lastname")
     def validate_name(cls, value):

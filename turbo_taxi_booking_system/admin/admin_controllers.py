@@ -108,3 +108,15 @@ class AdminController:
             return self.record
         except Exception as error:
             print(error)
+
+    def booking_details_data_fetcher(self, selected_booking_id):
+
+        try:
+            statement = "SELECT * FROM booking WHERE booking_id = %s"
+            cursor = self._connection.cursor()
+            data = selected_booking_id
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)

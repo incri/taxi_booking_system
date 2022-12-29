@@ -772,6 +772,8 @@ class BookingPage:
                 exp_date=exp_entry.get(),
                 cvv=cvv_entry.get(),
                 total_cost=BookingPage.final_cost,
+                pickup_coordinates=str(BookingPage.pickup_location_coordinates),
+                destination_coordinates=str(BookingPage.destination_coordinates),
             )
             booking_control = BookingController()
             booking_control.booking_control(user_booking, booking_form_frame)

@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import W, Scrollbar, ttk
 from tkinter.messagebox import NO
+
+from sqlalchemy import false
 from taxi.taxi_register import TaxiRegisterPage
 from driver.driver_register import DriverRegisterPage
+from tkintermapview import TkinterMapView
 
 
 class ControlPanelPage:
@@ -195,7 +198,11 @@ class ControlPanelPage:
             relwidth=0.060,
         )
 
-        ControlPanelPage.customer_table_build(customer_table_frame, record)
+        ControlPanelPage.customer_table_build(
+            customer_table_frame,
+            record,
+            admin_controller,
+        )
 
     @staticmethod
     def driver_table_frame_build(record, control_panel_frame, admin_controller):
@@ -371,7 +378,7 @@ class ControlPanelPage:
         dirver_table_frame.mainloop()
 
     @staticmethod
-    def customer_table_build(customer_table_frame, record):
+    def customer_table_build(customer_table_frame, record, admin_controller):
 
         # CUSTOMISING TABLE LOOK
         table_style = ttk.Style()
@@ -404,12 +411,12 @@ class ControlPanelPage:
             width=1025,
         )
 
-        customer_booking_table.bind("<Double-1>", ControlPanelPage.assign_taxi_to_user)
         customer_booking_table.bind(
             "<Double-1>",
             lambda event: ControlPanelPage.assign_taxi_to_user(
                 event,
                 customer_booking_table,
+                admin_controller,
             ),
         )
 
@@ -515,6 +522,7 @@ class ControlPanelPage:
         ControlPanelPage.customer_table_build(
             customer_table_frame,
             required_customer_search,
+            admin_controller,
         )
 
     @staticmethod
@@ -536,7 +544,26 @@ class ControlPanelPage:
         )
 
     @staticmethod
-    def assign_taxi_to_user(event, customer_booking_table):
+    def assign_taxi_to_user(event, customer_booking_table, admin_controller):
+
+        selected = customer_booking_table.focus()
+        selected_row = customer_booking_table.item(
+            selected,
+            "values",
+        )
+
+        selected_user_id = selected_row[0]
+        selected_booking_id = selected_row[1]
+
+        # Booking Details Data Fetcher
+
+        booking_data_control = admin_controller()
+        fetched_booking_details = booking_data_control.booking_details_data_fetcher(
+            selected_booking_id,
+        )
+
+        data = fetched_booking_details[0]
+
         assign_taxi_frame = tk.Toplevel(customer_booking_table)
         assign_taxi_frame.title("Assign Taxi")
         assign_taxi_frame.geometry("682x641+193+31")
@@ -576,8 +603,46 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""Baibhav Paudel""",
+            text=data[2] + " " + data[3],
         )
+
+        map_view_frame = tk.Frame(assign_taxi_frame)
+        map_view_frame.place(relx=0.640, rely=0.156, height=140, width=220)
+        map_view_frame.configure(
+            background="#FFFFFF",
+            borderwidth="2",
+            highlightthickness="2",
+        )
+
+        location_detail_map_view = TkinterMapView(map_view_frame)
+        location_detail_map_view.set_tile_server(
+            "https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga",
+            max_zoom=60,
+        )
+
+        pickup_cordinates = eval(data[19])
+        destination_coordinates = eval(data[20])
+
+        location_detail_map_view.set_marker(
+            pickup_cordinates[0],
+            pickup_cordinates[1],
+        )
+
+        location_detail_map_view.set_marker(
+            destination_coordinates[0],
+            destination_coordinates[1],
+        )
+
+        location_detail_map_view.set_position(
+            pickup_cordinates[0],
+            pickup_cordinates[1],
+        )
+
+        location_detail_map_view.set_path(
+            position_list=[pickup_cordinates, destination_coordinates]
+        )
+
+        location_detail_map_view.pack()
 
         passenger_no_label = tk.Label(assign_taxi_frame)
         passenger_no_label.place(relx=0.029, rely=0.234, height=34, width=175)
@@ -600,7 +665,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""12""",
+            text=data[4],
         )
 
         taxi_number = tk.Label(assign_taxi_frame)
@@ -625,7 +690,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""4""",
+            text=data[5],
         )
 
         pick_up_date_lable = tk.Label(assign_taxi_frame)
@@ -649,7 +714,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""2022/07/21""",
+            text=data[6],
         )
 
         pick_up_address_label = tk.Label(assign_taxi_frame)
@@ -684,7 +749,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""02:35""",
+            text=data[7] + ":" + data[8],
         )
 
         pickup_address_data = tk.Label(assign_taxi_frame)
@@ -694,10 +759,10 @@ class ControlPanelPage:
             anchor="w",
             background="#FFFFFF",
             compound="left",
-            font="-family {Noto Sans} -size 14",
+            font="-family {Noto Sans} -size 10",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""Hariyana, India""",
+            text=data[9],
         )
 
         destination_label = tk.Label(assign_taxi_frame)
@@ -720,10 +785,10 @@ class ControlPanelPage:
             anchor="w",
             background="#FFFFFF",
             compound="left",
-            font="-family {Noto Sans} -size 14",
+            font="-family {Noto Sans} -size 10",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""kathmandu, Nepal""",
+            text=data[10],
         )
 
         total_cost_label = tk.Label(assign_taxi_frame)
@@ -748,7 +813,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text="""1745 .NRS""",
+            text=data[11] + " .NPR",
         )
 
         payment_method_lable = tk.Label(assign_taxi_frame)
@@ -763,104 +828,107 @@ class ControlPanelPage:
             text="""Payment Method :""",
         )
 
-        cash_in_hand_lable = tk.Label(assign_taxi_frame)
-        cash_in_hand_lable.place(relx=0.293, rely=0.702, height=34, width=206)
-        cash_in_hand_lable.configure(
+        payment_method_data = tk.Label(assign_taxi_frame)
+        payment_method_data.place(relx=0.293, rely=0.702, height=34, width=206)
+        payment_method_data.configure(
             activebackground="#f9f9f9",
             anchor="w",
             background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[12],
         )
-        cash_in_hand_lable.configure()
-        cash_in_hand_lable.configure()
-        cash_in_hand_lable.configure(compound="left")
-        cash_in_hand_lable.configure(font="-family {Noto Sans} -size 14")
-        cash_in_hand_lable.configure(foreground="#4A4A4A")
-        cash_in_hand_lable.configure(highlightthickness="2")
-        cash_in_hand_lable.configure(text="""Cash In Hand""")
 
         credit_number_lable = tk.Label(assign_taxi_frame)
         credit_number_lable.place(relx=0.029, rely=0.78, height=34, width=236)
-        credit_number_lable.configure(activebackground="#f9f9f9")
-        credit_number_lable.configure(anchor="w")
-        credit_number_lable.configure(background="#FFFFFF")
-        credit_number_lable.configure(compound="left")
-        credit_number_lable.configure(font="-family {Noto Sans} -size 14")
-        credit_number_lable.configure(foreground="#4A4A4A")
-        credit_number_lable.configure(highlightthickness="2")
-        credit_number_lable.configure(text="""1455896523254521""")
+        credit_number_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            text=data[13],
+            highlightthickness="2",
+            foreground="#4A4A4A",
+            font="-family {Noto Sans} -size 14",
+            compound="left",
+        )
 
         exp_date_lable = tk.Label(assign_taxi_frame)
         exp_date_lable.place(relx=0.411, rely=0.78, height=34, width=96)
-        exp_date_lable.configure(activebackground="#f9f9f9")
-        exp_date_lable.configure(anchor="w")
-        exp_date_lable.configure(background="#FFFFFF")
-        exp_date_lable.configure(compound="left")
-        exp_date_lable.configure(font="-family {Noto Sans} -size 14")
-        exp_date_lable.configure(foreground="#4A4A4A")
-        exp_date_lable.configure(highlightthickness="2")
-        exp_date_lable.configure(text="""07/25""")
+        exp_date_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[14],
+        )
 
         cvv_lable = tk.Label(assign_taxi_frame)
         cvv_lable.place(relx=0.587, rely=0.78, height=34, width=96)
-        cvv_lable.configure(activebackground="#f9f9f9")
-        cvv_lable.configure(anchor="w")
-        cvv_lable.configure(background="#FFFFFF")
-        cvv_lable.configure(compound="left")
-        cvv_lable.configure(font="-family {Noto Sans} -size 14")
-        cvv_lable.configure(foreground="#4A4A4A")
-        cvv_lable.configure(highlightthickness="2")
-        cvv_lable.configure(text="""472""")
+        cvv_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[15],
+        )
 
         show_credit_detail_lable = tk.Checkbutton(assign_taxi_frame)
         show_credit_detail_lable.place(
             relx=0.748, rely=0.78, relheight=0.051, relwidth=0.164
         )
-        show_credit_detail_lable.configure(activebackground="beige")
-        show_credit_detail_lable.configure(anchor="w")
-        show_credit_detail_lable.configure(background="#FFFFFF")
-        show_credit_detail_lable.configure(compound="left")
-        show_credit_detail_lable.configure(highlightthickness="0")
-        show_credit_detail_lable.configure(justify="left")
-        show_credit_detail_lable.configure(selectcolor="#d9d9d9")
-        show_credit_detail_lable.configure(text="""Show Details""")
+        show_credit_detail_lable.configure(
+            activebackground="beige",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            highlightthickness="0",
+            justify="left",
+            selectcolor="#d9d9d9",
+            text="""Show Details""",
+        )
 
         assign_taxi_button = tk.Button(assign_taxi_frame)
         assign_taxi_button.place(relx=0.264, rely=0.889, height=33, width=141)
-        assign_taxi_button.configure(activebackground="beige")
-        assign_taxi_button.configure(background="#007074")
-        assign_taxi_button.configure(borderwidth="2")
-        assign_taxi_button.configure(compound="left")
-        assign_taxi_button.configure(font="-family {Noto Sans} -size 10 -weight bold")
-        assign_taxi_button.configure(foreground="#FFFFFF")
-        assign_taxi_button.configure(text="""Assign Taxi""")
+        assign_taxi_button.configure(
+            activebackground="beige",
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 10 -weight bold",
+            foreground="#FFFFFF",
+            text="""Assign Taxi""",
+        )
 
         cancel_button = tk.Button(assign_taxi_frame)
         cancel_button.place(relx=0.499, rely=0.889, height=33, width=141)
-        cancel_button.configure(activebackground="beige")
-        cancel_button.configure(background="#007074")
-        cancel_button.configure(borderwidth="2")
-        cancel_button.configure(compound="left")
-        cancel_button.configure(font="-family {Noto Sans} -size 10 -weight bold")
-        cancel_button.configure(foreground="#FFFFFF")
-        cancel_button.configure(text="""Cancel""")
+        cancel_button.configure(
+            activebackground="beige",
+            background="#007074",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 10 -weight bold",
+            text="""Cancel""",
+            foreground="#FFFFFF",
+        )
 
         back_button = tk.Button(assign_taxi_frame)
         back_button.place(relx=0.865, rely=0.031, height=33, width=71)
-        back_button.configure(activebackground="beige")
-        back_button.configure(borderwidth="2")
-        back_button.configure(compound="left")
-        back_button.configure(font="-family {Noto Sans} -size 10")
-        back_button.configure(foreground="#FFFFFF")
-        back_button.configure(text="""Back""")
-
-        selected = customer_booking_table.focus()
-        selected_row = customer_booking_table.item(
-            selected,
-            "values",
+        back_button.configure(
+            activebackground="beige",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            foreground="#FFFFFF",
+            text="""Back""",
         )
-
-        selected_user_id = selected_row[0]
-        selected_booking_id = selected_row[1]
 
         assign_taxi_frame.wait_visibility()
         assign_taxi_frame.grab_set()
