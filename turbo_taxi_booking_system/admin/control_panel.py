@@ -1,7 +1,10 @@
+from select import select
 import tkinter as tk
 from tkinter import W, Scrollbar, ttk
 from tkinter import messagebox
 from tkinter.messagebox import NO
+
+from click import command
 
 from taxi.taxi_register import TaxiRegisterPage
 from driver.driver_register import DriverRegisterPage
@@ -1015,47 +1018,24 @@ class ControlPanelPage:
         sort_by_combo.place(relx=0.370, rely=0.070, height=25, relwidth=0.200)
         sort_by_combo.current(0)
 
+        sort_by_combo.bind(
+            "<<ComboboxSelected>>",
+            lambda event: ControlPanelPage.available_driver_table_view(
+                assign_table_frame,
+                admin_controller,
+                selected_driver_type,
+            ),
+        )
+
         # Driver TABLE LOOK
-        table_style = ttk.Style()
-        table_style.theme_use("default")
-        table_style.configure(
-            "Treeview",
-            background="#FFFFFF",
-            foreground="#4A4A4A",
-            rowheight="35",
-            fieldbackground="#FFFFFF",
-        )
-        table_style.map("Treeview", background=[("selected", "#C9C9C9")])
 
-        # driver Table Scroll Bar
-
-        table_scroll_bar = Scrollbar(assign_table_frame)
-        table_scroll_bar.place(relx=0.970, rely=0.150, height=280, width=15)
-
-        # driver Table Build
-
-        driver_booking_table = ttk.Treeview(
-            assign_table_frame,
-            yscrollcommand=table_scroll_bar.set,
-            selectmode="extended",
-        )
-        driver_booking_table.place(
-            relx=0.030,
-            rely=0.150,
-            height=280,
-            width=550,
-        )
-        # driver a scroll bar
-
-        table_scroll_bar.config(
-            command=driver_booking_table.yview,
-        )
         # Define Column
 
         if selected_driver_type.get() == "Avalable":
             ControlPanelPage.available_driver_table_view(
+                assign_table_frame,
                 admin_controller,
-                driver_booking_table,
+                selected_driver_type,
             )
 
         assign_table_frame.wait_visibility()
@@ -1064,43 +1044,155 @@ class ControlPanelPage:
 
     @staticmethod
     def available_driver_table_view(
+        assign_table_frame,
         admin_controller,
-        driver_booking_table,
+        selected_driver_type,
     ):
 
-        driver_booking_table["columns"] = (
-            "Driver ID",
-            "Full Name",
-            "Contact",
-            "Taxi Number",
-        )
-        # Format Our Columns
+        if selected_driver_type.get() == "Avalable":
 
-        driver_booking_table.column("#0", width=0, stretch=NO)
-        driver_booking_table.column("Driver ID", width=40, anchor=W)
-        driver_booking_table.column("Full Name", width=70, anchor=W)
-        driver_booking_table.column("Contact", width=70, anchor=W)
-        driver_booking_table.column("Taxi Number", width=80, anchor=W)
-
-        # Create Heading
-
-        driver_booking_table.heading("#0", text="", anchor=W)
-        driver_booking_table.heading("Driver ID", text="Driver ID", anchor=W)
-        driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
-        driver_booking_table.heading("Contact", text="Contact", anchor=W)
-        driver_booking_table.heading("Taxi Number", text="Taxi Number", anchor=W)
-
-        availavble_driver_control = admin_controller()
-        record = availavble_driver_control.available_driver_fetcher()
-
-        for data in record:
-            driver_booking_table.insert(
-                "",
-                index="end",
-                values=(
-                    data[0],
-                    data[1],
-                    data[3],
-                    data[4],
-                ),
+            table_style = ttk.Style()
+            table_style.theme_use("default")
+            table_style.configure(
+                "Treeview",
+                background="#FFFFFF",
+                foreground="#4A4A4A",
+                rowheight="35",
+                fieldbackground="#FFFFFF",
             )
+            table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+            # driver Table Scroll Bar
+
+            table_scroll_bar = Scrollbar(assign_table_frame)
+            table_scroll_bar.place(relx=0.970, rely=0.150, height=280, width=15)
+
+            # driver Table Build
+
+            driver_booking_table = ttk.Treeview(
+                assign_table_frame,
+                yscrollcommand=table_scroll_bar.set,
+                selectmode="extended",
+            )
+            driver_booking_table.place(
+                relx=0.030,
+                rely=0.150,
+                height=280,
+                width=550,
+            )
+            # driver a scroll bar
+
+            table_scroll_bar.config(
+                command=driver_booking_table.yview,
+            )
+
+            driver_booking_table["columns"] = (
+                "Driver ID",
+                "Full Name",
+                "Contact",
+                "Taxi Number",
+            )
+            # Format Our Columns
+
+            driver_booking_table.column("#0", width=0, stretch=NO)
+            driver_booking_table.column("Driver ID", width=40, anchor=W)
+            driver_booking_table.column("Full Name", width=70, anchor=W)
+            driver_booking_table.column("Contact", width=70, anchor=W)
+            driver_booking_table.column("Taxi Number", width=80, anchor=W)
+
+            # Create Heading
+
+            driver_booking_table.heading("#0", text="", anchor=W)
+            driver_booking_table.heading("Driver ID", text="Driver ID", anchor=W)
+            driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
+            driver_booking_table.heading("Contact", text="Contact", anchor=W)
+            driver_booking_table.heading("Taxi Number", text="Taxi Number", anchor=W)
+
+            availavble_driver_control = admin_controller()
+            record = availavble_driver_control.available_driver_fetcher()
+
+            for data in record:
+                driver_booking_table.insert(
+                    "",
+                    index="end",
+                    values=(
+                        data[0],
+                        data[1],
+                        data[3],
+                        data[4],
+                    ),
+                )
+
+        else:
+
+            table_style = ttk.Style()
+            table_style.theme_use("default")
+            table_style.configure(
+                "Treeview",
+                background="#FFFFFF",
+                foreground="#4A4A4A",
+                rowheight="35",
+                fieldbackground="#FFFFFF",
+            )
+            table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+            # driver Table Scroll Bar
+
+            table_scroll_bar = Scrollbar(assign_table_frame)
+            table_scroll_bar.place(relx=0.970, rely=0.150, height=280, width=15)
+
+            # driver Table Build
+
+            driver_booking_table = ttk.Treeview(
+                assign_table_frame,
+                yscrollcommand=table_scroll_bar.set,
+                selectmode="extended",
+            )
+            driver_booking_table.place(
+                relx=0.030,
+                rely=0.150,
+                height=280,
+                width=550,
+            )
+            # driver a scroll bar
+
+            table_scroll_bar.config(
+                command=driver_booking_table.yview,
+            )
+
+            driver_booking_table["columns"] = (
+                "Driver ID",
+                "Full Name",
+                "Contact",
+                "Taxi Number",
+            )
+            # Format Our Columns
+
+            driver_booking_table.column("#0", width=0, stretch=NO)
+            driver_booking_table.column("Driver ID", width=40, anchor=W)
+            driver_booking_table.column("Full Name", width=70, anchor=W)
+            driver_booking_table.column("Contact", width=70, anchor=W)
+            driver_booking_table.column("Taxi Number", width=80, anchor=W)
+
+            # Create Heading
+
+            driver_booking_table.heading("#0", text="", anchor=W)
+            driver_booking_table.heading("Driver ID", text="Driver ID", anchor=W)
+            driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
+            driver_booking_table.heading("Contact", text="Contact", anchor=W)
+            driver_booking_table.heading("Taxi Number", text="Taxi Number", anchor=W)
+
+            availavble_driver_control = admin_controller()
+            record = availavble_driver_control.available_driver_fetcher()
+
+            for data in record:
+                driver_booking_table.insert(
+                    "",
+                    index="end",
+                    values=(
+                        data[0],
+                        data[1],
+                        data[3],
+                        data[4],
+                    ),
+                )
