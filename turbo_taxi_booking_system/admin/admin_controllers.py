@@ -38,7 +38,7 @@ class AdminController:
 
         try:
             cursor = self._connection.cursor()
-            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id order by b.created_at_date, b.created_at_time;"
+            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where b.booking_status = 'Pending' order by b.created_at_date, b.created_at_time;"
             cursor.execute(statement)
             self.record = cursor.fetchall()
             return self.record
@@ -47,23 +47,19 @@ class AdminController:
 
     def customer_search_fetcher(self, search_entry, selected_sort_by):
 
-        if selected_sort_by.get() == "Date":
-            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, b.created_at_time;"
+        if selected_sort_by.get() == "Pending":
+            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%') and b.booking_status = 'Pending' order by b.created_at_date, b.created_at_time;"
         else:
-            if selected_sort_by.get() == "Full Name":
-                statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by u.firstname;"
+            if selected_sort_by.get() == "Accepted":
+                statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%') and b.booking_status = 'Accepted' order by b.created_at_date, b.created_at_time;"
 
             else:
-                if selected_sort_by.get() == "User ID":
-                    statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, u.userid;"
+                if selected_sort_by.get() == "Canceled":
+                    statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%') and b.booking_status = 'Canceled' order by b.created_at_date, b.created_at_time;"
 
                 else:
-                    if selected_sort_by.get() == "Booking ID":
-                        statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.booking_id;"
-
-                    else:
-                        if selected_sort_by.get() == "":
-                            statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%')  order by b.created_at_date, b.created_at_time;"
+                    if selected_sort_by.get() == "All":
+                        statement = "SELECT u.userid, b.booking_id, b.created_at_date, CONCAT(u.firstname,' ',u.lastname) as fullname, u.contact, u.address, u.email, b.booking_status from users as u JOIN booking as b on u.userid = b.user_id where concat(u.firstname , ' ' , u.lastname) like concat('%%',%s,'%%') order by b.created_at_date, b.created_at_time;"
 
         try:
             cursor = self._connection.cursor()
@@ -116,6 +112,29 @@ class AdminController:
             cursor = self._connection.cursor()
             data = selected_booking_id
             cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def cancel_booking(self, booking_id):
+        try:
+            statement = "UPDATE booking SET booking_status = 'Canceled' WHERE booking_id = %s AND booking_status = 'Pending';"
+
+            b_id = str(booking_id)
+            cursor = self._connection.cursor()
+            data = b_id
+            cursor.execute(statement, data)
+            self._connection.commit()
+
+        except Exception as error:
+            print(error)
+
+    def available_driver_fetcher(self):
+        try:
+            statement = "SELECT * FROM drivers WHERE driver_status = 'Available'"
+            cursor = self._connection.cursor()
+            cursor.execute(statement)
             self.record = cursor.fetchall()
             return self.record
         except Exception as error:

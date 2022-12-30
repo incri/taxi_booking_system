@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import W, Scrollbar, ttk
+from tkinter import messagebox
 from tkinter.messagebox import NO
 
-from sqlalchemy import false
 from taxi.taxi_register import TaxiRegisterPage
 from driver.driver_register import DriverRegisterPage
 from tkintermapview import TkinterMapView
@@ -167,7 +167,12 @@ class ControlPanelPage:
             customer_table_frame,
             textvariable=selected_sort_by,
             state="readonly",
-            values=("Date", "Full Name", "Booking ID", "User ID"),
+            values=(
+                "Pending",
+                "Accepted",
+                "Canceled",
+                "All",
+            ),
         )
 
         sort_by_combo.place(relx=0.460, rely=0.050, height=25, relwidth=0.150)
@@ -185,7 +190,7 @@ class ControlPanelPage:
 
         sort_by_label = tk.Label(
             customer_table_frame,
-            text=": sort by",
+            text=": View",
             anchor=W,
             background="#FFFFFF",
             foreground="#4A4A4A",
@@ -905,19 +910,31 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 10 -weight bold",
             foreground="#FFFFFF",
             text="""Assign Taxi""",
+            command=lambda: ControlPanelPage.taxi_assign_final_frame(
+                assign_taxi_frame, admin_controller
+            ),
         )
 
-        cancel_button = tk.Button(assign_taxi_frame)
-        cancel_button.place(relx=0.499, rely=0.889, height=33, width=141)
-        cancel_button.configure(
+        cancel_booking_button = tk.Button(assign_taxi_frame)
+        cancel_booking_button.place(relx=0.499, rely=0.889, height=33, width=141)
+        cancel_booking_button.configure(
             activebackground="beige",
             background="#007074",
             borderwidth="2",
             compound="left",
             font="-family {Noto Sans} -size 10 -weight bold",
-            text="""Cancel""",
+            text="""Cancel Booking""",
             foreground="#FFFFFF",
+            command=lambda: ControlPanelPage.cancel_booking_request(
+                admin_controller, data, assign_taxi_frame
+            ),
         )
+        if data[16] == "Canceled":
+            assign_taxi_button.config(state="disable")
+            cancel_booking_button.config(state="disable")
+
+        if data[16] == "Accepted":
+            assign_taxi_button.config(state="disable")
 
         back_button = tk.Button(assign_taxi_frame)
         back_button.place(relx=0.865, rely=0.031, height=33, width=71)
@@ -928,8 +945,162 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 10",
             foreground="#FFFFFF",
             text="""Back""",
+            command=lambda: ControlPanelPage.exit_assign_taxi_page(
+                assign_taxi_frame,
+            ),
         )
 
         assign_taxi_frame.wait_visibility()
         assign_taxi_frame.grab_set()
         assign_taxi_frame.mainloop()
+
+    @staticmethod
+    def exit_assign_taxi_page(assign_taxi_frame):
+        assign_taxi_frame.destroy()
+
+    @staticmethod
+    def cancel_booking_request(admin_controller, data, assign_taxi_frame):
+
+        booking_id = data[0]
+
+        response = messagebox.askquestion(
+            "Warning",
+            "Do you really want to cancele this booking?",
+            parent=assign_taxi_frame,
+        )
+
+        if response == "yes":
+            cancel_booking_control = admin_controller()
+            cancel_booking_control.cancel_booking(booking_id)
+            assign_taxi_frame.destroy()
+
+    @staticmethod
+    def taxi_assign_final_frame(assign_taxi_frame, admin_controller):
+
+        assign_table_frame = tk.Toplevel(assign_taxi_frame)
+        assign_table_frame.geometry("600x400+193+31")
+        assign_table_frame.resizable(0, 0)
+        assign_table_frame.configure(background="#FFFFFF")
+
+        search_entry = tk.Entry(assign_table_frame)
+
+        search_entry.place(relx=0.030, rely=0.070, height=25, relwidth=0.200)
+        search_entry.configure(
+            background="#EFF0F2", font="TkFixedFont", selectbackground="#c4c4c4"
+        )
+
+        search_button = tk.Button(assign_table_frame)
+
+        search_button.place(relx=0.250, rely=0.070, height=25, relwidth=0.100)
+        search_button.configure(
+            activebackground="beige",
+            borderwidth="1",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            text="""Search""",
+        )
+
+        selected_driver_type = tk.StringVar()
+
+        sort_by_combo = ttk.Combobox(
+            assign_table_frame,
+            textvariable=selected_driver_type,
+            state="readonly",
+            values=(
+                "Avalable",
+                "Booked",
+            ),
+        )
+
+        sort_by_combo.place(relx=0.370, rely=0.070, height=25, relwidth=0.200)
+        sort_by_combo.current(0)
+
+        # Driver TABLE LOOK
+        table_style = ttk.Style()
+        table_style.theme_use("default")
+        table_style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+            rowheight="35",
+            fieldbackground="#FFFFFF",
+        )
+        table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+        # driver Table Scroll Bar
+
+        table_scroll_bar = Scrollbar(assign_table_frame)
+        table_scroll_bar.place(relx=0.970, rely=0.150, height=280, width=15)
+
+        # driver Table Build
+
+        driver_booking_table = ttk.Treeview(
+            assign_table_frame,
+            yscrollcommand=table_scroll_bar.set,
+            selectmode="extended",
+        )
+        driver_booking_table.place(
+            relx=0.030,
+            rely=0.150,
+            height=280,
+            width=550,
+        )
+        # driver a scroll bar
+
+        table_scroll_bar.config(
+            command=driver_booking_table.yview,
+        )
+        # Define Column
+
+        if selected_driver_type.get() == "Avalable":
+            ControlPanelPage.available_driver_table_view(
+                admin_controller,
+                driver_booking_table,
+            )
+
+        assign_table_frame.wait_visibility()
+        assign_table_frame.grab_set()
+        assign_table_frame.mainloop()
+
+    @staticmethod
+    def available_driver_table_view(
+        admin_controller,
+        driver_booking_table,
+    ):
+
+        driver_booking_table["columns"] = (
+            "Driver ID",
+            "Full Name",
+            "Contact",
+            "Taxi Number",
+        )
+        # Format Our Columns
+
+        driver_booking_table.column("#0", width=0, stretch=NO)
+        driver_booking_table.column("Driver ID", width=40, anchor=W)
+        driver_booking_table.column("Full Name", width=70, anchor=W)
+        driver_booking_table.column("Contact", width=70, anchor=W)
+        driver_booking_table.column("Taxi Number", width=80, anchor=W)
+
+        # Create Heading
+
+        driver_booking_table.heading("#0", text="", anchor=W)
+        driver_booking_table.heading("Driver ID", text="Driver ID", anchor=W)
+        driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
+        driver_booking_table.heading("Contact", text="Contact", anchor=W)
+        driver_booking_table.heading("Taxi Number", text="Taxi Number", anchor=W)
+
+        availavble_driver_control = admin_controller()
+        record = availavble_driver_control.available_driver_fetcher()
+
+        for data in record:
+            driver_booking_table.insert(
+                "",
+                index="end",
+                values=(
+                    data[0],
+                    data[1],
+                    data[3],
+                    data[4],
+                ),
+            )
