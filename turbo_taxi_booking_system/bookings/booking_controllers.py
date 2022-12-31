@@ -40,7 +40,9 @@ class BookingController:
                 created_at_date     VARCHAR(30),
                 created_at_time     VARCHAR(30),
                 pickup_coordinate   VARCHAR(100),
-                destination_coordinate  VARCHAR(100)
+                destination_coordinate  VARCHAR(100),
+                driver_id           VARCHAR(50)
+
 
 
             );"""
@@ -49,8 +51,8 @@ class BookingController:
                 no_of_passenger, no_of_taxi, pickup_date, pickup_time_hrs, \
                 pickup_time_min, pickup_location, destination, total_cost, \
                 payment_method, card_number, card_exp, card_cvv, booking_status, created_at_date, created_at_time, \
-                pickup_coordinate, destination_coordinate) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                pickup_coordinate, destination_coordinate, driver_id) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
 
             dataValues = (
                 user_booking.user_id,
@@ -73,6 +75,7 @@ class BookingController:
                 booking_created_at_time,
                 user_booking.pickup_coordinates,
                 user_booking.destination_coordinates,
+                "Not Assigned",
             )
             cursor.execute(statement)
             cursor.execute(dataInsert, dataValues)

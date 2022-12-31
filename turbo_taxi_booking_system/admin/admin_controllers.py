@@ -139,3 +139,33 @@ class AdminController:
             return self.record
         except Exception as error:
             print(error)
+
+    def booked_driver_fetcher(self):
+        try:
+            statement = "SELECT * FROM drivers WHERE driver_status = 'Booked'"
+            cursor = self._connection.cursor()
+            cursor.execute(statement)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def assign_controller(self, driver_id, booking_id):
+        try:
+            booking_statement = "Update booking set booking_status = 'Accepted', driver_id = %s WHERE booking_id = %s ;"
+            did = str(driver_id)
+            bid = str(booking_id)
+            booking_data = (did, bid)
+
+            driver_statement = (
+                "Update drivers set driver_status = 'Booked' where driverid = %s;"
+            )
+
+            driver_data = did
+
+            cursor = self._connection.cursor()
+            cursor.execute(booking_statement, booking_data)
+            cursor.execute(driver_statement, driver_data)
+            self._connection.commit()
+        except Exception as error:
+            print(error)

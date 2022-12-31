@@ -559,8 +559,6 @@ class ControlPanelPage:
             selected,
             "values",
         )
-
-        selected_user_id = selected_row[0]
         selected_booking_id = selected_row[1]
 
         # Booking Details Data Fetcher
@@ -914,7 +912,7 @@ class ControlPanelPage:
             foreground="#FFFFFF",
             text="""Assign Taxi""",
             command=lambda: ControlPanelPage.taxi_assign_final_frame(
-                assign_taxi_frame, admin_controller
+                assign_taxi_frame, admin_controller, data
             ),
         )
 
@@ -978,7 +976,7 @@ class ControlPanelPage:
             assign_taxi_frame.destroy()
 
     @staticmethod
-    def taxi_assign_final_frame(assign_taxi_frame, admin_controller):
+    def taxi_assign_final_frame(assign_taxi_frame, admin_controller, booking_id):
 
         assign_table_frame = tk.Toplevel(assign_taxi_frame)
         assign_table_frame.geometry("600x400+193+31")
@@ -1024,10 +1022,9 @@ class ControlPanelPage:
                 assign_table_frame,
                 admin_controller,
                 selected_driver_type,
+                booking_id,
             ),
         )
-
-        # Driver TABLE LOOK
 
         # Define Column
 
@@ -1036,6 +1033,7 @@ class ControlPanelPage:
                 assign_table_frame,
                 admin_controller,
                 selected_driver_type,
+                booking_id,
             )
 
         assign_table_frame.wait_visibility()
@@ -1047,6 +1045,7 @@ class ControlPanelPage:
         assign_table_frame,
         admin_controller,
         selected_driver_type,
+        booking_id,
     ):
 
         if selected_driver_type.get() == "Avalable":
@@ -1123,6 +1122,23 @@ class ControlPanelPage:
                     ),
                 )
 
+            assign_button = tk.Button(assign_table_frame)
+            assign_button.place(relx=0.400, rely=0.880, height=35, width=120)
+            assign_button.configure(
+                background="#007074",
+                borderwidth="2",
+                compound="left",
+                font="-family {Noto Sans} -size 14",
+                foreground="#FFFFFF",
+                text="""Assign""",
+                command=lambda: ControlPanelPage.selcted_driver_row_assign(
+                    driver_booking_table,
+                    admin_controller,
+                    booking_id,
+                    assign_table_frame,
+                ),
+            )
+
         else:
 
             table_style = ttk.Style()
@@ -1183,7 +1199,7 @@ class ControlPanelPage:
             driver_booking_table.heading("Taxi Number", text="Taxi Number", anchor=W)
 
             availavble_driver_control = admin_controller()
-            record = availavble_driver_control.available_driver_fetcher()
+            record = availavble_driver_control.booked_driver_fetcher()
 
             for data in record:
                 driver_booking_table.insert(
@@ -1196,3 +1212,39 @@ class ControlPanelPage:
                         data[4],
                     ),
                 )
+
+            assign_button = tk.Button(assign_table_frame)
+            assign_button.place(relx=0.400, rely=0.880, height=35, width=120)
+            assign_button.configure(
+                background="#007074",
+                borderwidth="2",
+                compound="left",
+                font="-family {Noto Sans} -size 14",
+                foreground="#FFFFFF",
+                text="""Not Now""",
+            )
+
+    @staticmethod
+    def selcted_driver_row_assign(
+        driver_booking_table,
+        admin_controller,
+        booking_details,
+        assign_table_frame,
+    ):
+        selected_row = driver_booking_table.focus()
+        driver_id = driver_booking_table.item(selected_row, "values")
+        seleted_driver_id = driver_id[0]
+        booking_id = booking_details[0]
+
+        assign_taxi_controll = admin_controller()
+        assign_taxi_controll.assign_controller(seleted_driver_id, booking_id)
+
+        messagebox.showinfo(
+            "Sucess",
+            "Driver ID "
+            + str(seleted_driver_id)
+            + " Sucessfully  assigned to booking id "
+            + str(booking_id),
+        )
+
+        assign_table_frame.destroy()
