@@ -18,7 +18,7 @@ class TaxiController:
                 brand   VARCHAR(50) NOT NULL,
                 model    VARCHAR(50) NOT NULL,
                 taxi_number VARCHAR(20) NOT NULL UNIQUE,
-                taxi_age VARCHAR(50) NOT NULL,
+                taxi_age INT NOT NULL,
                 discription   VARCHAR(50) NOT NULL ,
                 status  VARCHAR(40)
                 

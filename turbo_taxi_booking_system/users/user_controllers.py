@@ -1,3 +1,4 @@
+from curses import use_default_colors
 from tkinter import messagebox
 from helper.turbo_db import Turbo_db
 import psycopg2
@@ -16,14 +17,14 @@ class UserController:
         try:
             cursor = self._connection.cursor()
             statement = """CREATE TABLE IF NOT EXISTS users(
-                userID  SERIAL PRIMARY KEY,
+                userID   SERIAL PRIMARY KEY,
                 firstname   VARCHAR(50) NOT NULL,
-                lastname    VARCHAR(50) NOT NULL,
-                contact VARCHAR(20) NOT NULL,
-                address VARCHAR(50) NOT NULL,
+                lastname   VARCHAR(50) NOT NULL,
+                contact   VARCHAR(20) NOT NULL,
+                address   VARCHAR(50) NOT NULL,
                 email   VARCHAR(50) NOT NULL UNIQUE,
-                username    VARCHAR(20) NOT NULL UNIQUE,
-                password    VARCHAR(20) NOT NULL,
+                username   VARCHAR(20) NOT NULL UNIQUE,
+                password   VARCHAR(20) NOT NULL,
                 profile BYTEA
             );"""
 
@@ -236,9 +237,9 @@ class UserController:
 
         try:
             cursor = self._connection.cursor()
-            statement = "SELECT * FROM booking as b JOIN drivers as d on b.driver_id = d.driverid JOIN taxi as t on d.taxi_number = t.taxi_number WHERE user_id = %s AND b.booking_status = 'Pending' OR b.booking_status = 'Accepted';"
+            statement = "SELECT * FROM booking as b LEFT JOIN drivers as d on b.driver_id = d.driverid LEFT JOIN taxi as t on d.taxi_number = t.taxi_number WHERE b.booking_status = 'Pending' AND user_id = %s OR b.booking_status = 'Accepted' AND user_id = %s ;"
             uid = str(user_id)
-            data = uid
+            data = (uid, uid)
             cursor.execute(statement, data)
             self.record = cursor.fetchall()
             return self.record

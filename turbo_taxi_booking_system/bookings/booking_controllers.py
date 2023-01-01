@@ -24,11 +24,11 @@ class BookingController:
                 user_id             INT NOT NULL,
                 firstname           VARCHAR(50) NOT NULL,
                 lastname            VARCHAR(50) NOT NULL,
-                no_of_passenger     VARCHAR(10) NOT NULL,
-                no_of_taxi          VARCHAR(10) NOT NULL,
-                pickup_date         VARCHAR(20) NOT NULL,
-                pickup_time_hrs      VARCHAR(10) NOT NULL,
-                pickup_time_min      VARCHAR(10) NOT NULL,
+                no_of_passenger     INT NOT NULL,
+                no_of_taxi          INT NOT NULL,
+                pickup_date         DATE NOT NULL,
+                pickup_time_hrs     INT NOT NULL,
+                pickup_time_min     INT NOT NULL,
                 pickup_location     VARCHAR(100) NOT NULL,
                 destination         VARCHAR(100) NOT NULL,
                 total_cost          VARCHAR(20) NOT NULL,
@@ -37,7 +37,7 @@ class BookingController:
                 card_exp            VARCHAR(20),
                 card_cvv            VARCHAR(10),
                 booking_status      VARCHAR(20),
-                created_at_date     VARCHAR(30),
+                created_at_date     DATE NOT NULL,
                 created_at_time     VARCHAR(30),
                 pickup_coordinate   VARCHAR(100),
                 destination_coordinate  VARCHAR(100),
@@ -51,8 +51,8 @@ class BookingController:
                 no_of_passenger, no_of_taxi, pickup_date, pickup_time_hrs, \
                 pickup_time_min, pickup_location, destination, total_cost, \
                 payment_method, card_number, card_exp, card_cvv, booking_status, created_at_date, created_at_time, \
-                pickup_coordinate, destination_coordinate, driver_id) \
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+                pickup_coordinate, destination_coordinate) \
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"""
 
             dataValues = (
                 user_booking.user_id,
@@ -75,7 +75,6 @@ class BookingController:
                 booking_created_at_time,
                 user_booking.pickup_coordinates,
                 user_booking.destination_coordinates,
-                0,
             )
             cursor.execute(statement)
             cursor.execute(dataInsert, dataValues)

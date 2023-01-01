@@ -128,7 +128,7 @@ class BookingPage:
         )
 
         no_of_passenger_entry = tk.Spinbox(
-            booking_form_frame, from_=1.0, to=12.0, state="readonly"
+            booking_form_frame, from_=1.0, to=4.0, state="readonly"
         )
         no_of_passenger_entry.place(
             relx=0.192, rely=0.421, relheight=0.038, relwidth=0.079
@@ -151,7 +151,7 @@ class BookingPage:
         )
 
         no_of_taxi_entry = tk.Spinbox(
-            booking_form_frame, from_=1.0, to=3.0, state="readonly"
+            booking_form_frame, from_=1.0, to=2.0, state="disable"
         )
         no_of_taxi_entry.place(relx=0.192, rely=0.488, relheight=0.038, relwidth=0.079)
         no_of_taxi_entry.configure(
@@ -216,7 +216,7 @@ class BookingPage:
             selectbackground="#c4c4c4",
         )
 
-        minute_entry = tk.Spinbox(booking_form_frame, from_=0.0, to=59.0)
+        minute_entry = tk.Spinbox(booking_form_frame, from_=0.0, to=55.0, increment=5.0)
         minute_entry.place(relx=0.370, rely=0.556, relheight=0.038, relwidth=0.079)
         minute_entry.configure(
             activebackground="#f9f9f9",

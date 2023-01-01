@@ -20,7 +20,7 @@ class DriverController:
             statement = """CREATE TABLE IF NOT EXISTS drivers(
                 driverID  SERIAL PRIMARY KEY,
                 fullname   VARCHAR(50) NOT NULL,
-                license_number    VARCHAR(50) NOT NULL,
+                license_number    VARCHAR(50) NOT NULL UNIQUE,
                 contact VARCHAR(20) NOT NULL,
                 taxi_number VARCHAR(50) NOT NULL,
                 driver_status   VARCHAR(50) NOT NULL
