@@ -41,7 +41,7 @@ class BookingController:
                 created_at_time     VARCHAR(30),
                 pickup_coordinate   VARCHAR(100),
                 destination_coordinate  VARCHAR(100),
-                driver_id           VARCHAR(50)
+                driver_id           INT
 
 
 
@@ -75,7 +75,7 @@ class BookingController:
                 booking_created_at_time,
                 user_booking.pickup_coordinates,
                 user_booking.destination_coordinates,
-                "Not Assigned",
+                0,
             )
             cursor.execute(statement)
             cursor.execute(dataInsert, dataValues)

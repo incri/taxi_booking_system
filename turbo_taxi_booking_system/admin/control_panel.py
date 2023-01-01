@@ -1,4 +1,5 @@
 from select import select
+from sre_parse import State
 import tkinter as tk
 from tkinter import W, Scrollbar, ttk
 from tkinter import messagebox
@@ -1222,6 +1223,7 @@ class ControlPanelPage:
                 font="-family {Noto Sans} -size 14",
                 foreground="#FFFFFF",
                 text="""Not Now""",
+                state="disabled",
             )
 
     @staticmethod

@@ -1,6 +1,6 @@
-from errno import ESTALE
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import NO, W, Scrollbar, messagebox, filedialog
+from tkinter import ttk
 from helper.constants import LOGO_LOCATION
 from PIL import Image, ImageTk
 from io import BytesIO
@@ -192,7 +192,7 @@ class ProfilePage:
         )
 
         upcoming_trips = tk.Label(profile_frame)
-        upcoming_trips.place(x=590, y=440, height=41, width=245)
+        upcoming_trips.place(x=550, y=440, height=41, width=245)
         upcoming_trips.configure(
             anchor="w",
             background="#FFFFFF",
@@ -200,19 +200,6 @@ class ProfilePage:
             font="-family {Noto Sans} -size 16",
             foreground="#3056D3",
             text="""Your Upcoming Trips""",
-        )
-
-        trip_table = tk.Label(profile_frame)
-        trip_table.place(
-            x=49,
-            y=490,
-            height=131,
-            width=1212,
-        )
-        trip_table.configure(
-            anchor="w",
-            compound="left",
-            text="""Label""",
         )
 
         back_button = tk.Button(profile_frame)
@@ -225,6 +212,12 @@ class ProfilePage:
             foreground="#FFFFFF",
             text="""Back""",
             command=lambda: ProfilePage.redirect_to_dashboard(profile_frame),
+        )
+
+        ProfilePage.upcoming_trip_table_viwer(
+            profile_frame,
+            user_controller,
+            record,
         )
 
         profile_frame.mainloop()
@@ -718,3 +711,100 @@ class ProfilePage:
 
         except CustomException as e:
             messagebox.showerror("Invalid Data", e, parent=edit_bio_frame)
+
+    @staticmethod
+    def upcoming_trip_table_viwer(profile_frame, user_controller, record):
+
+        for data in record:
+            userid = data[0]
+
+        upcoming_trip_table = tk.Frame(profile_frame, bg="#FFFFFF")
+        upcoming_trip_table.place(
+            x=49,
+            y=490,
+            height=130,
+            width=1212,
+        )
+
+        # Upcoming booking details table
+
+        table_style = ttk.Style()
+        table_style.theme_use("default")
+        table_style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+            rowheight="35",
+            fieldbackground="#FFFFFF",
+        )
+        table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+        # driver Table Scroll Bar
+
+        table_scroll_bar = Scrollbar(upcoming_trip_table)
+        table_scroll_bar.place(relx=0.985, rely=0, height=130, width=15)
+
+        # driver Table Build
+
+        driver_booking_table = ttk.Treeview(
+            upcoming_trip_table,
+            yscrollcommand=table_scroll_bar.set,
+            selectmode="extended",
+        )
+        driver_booking_table.place(
+            relx=0,
+            rely=0,
+            height=280,
+            width=1180,
+        )
+        # driver a scroll bar
+
+        table_scroll_bar.config(
+            command=driver_booking_table.yview,
+        )
+
+        driver_booking_table["columns"] = (
+            "Booking ID",
+            "Full Name",
+            "Date and Time",
+            "Destination",
+            "Total Cost",
+            "Status",
+        )
+        # Format Our Columns
+
+        driver_booking_table.column("#0", width=0, stretch=NO)
+        driver_booking_table.column("Booking ID", width=20, anchor=W)
+        driver_booking_table.column("Full Name", width=70, anchor=W)
+        driver_booking_table.column("Date and Time", width=70, anchor=W)
+        driver_booking_table.column("Destination", width=240, anchor=W)
+        driver_booking_table.column("Total Cost", width=40, anchor=W)
+        driver_booking_table.column("Status", width=40, anchor=W)
+
+        # Create Heading
+
+        driver_booking_table.heading("#0", text="", anchor=W)
+        driver_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
+        driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
+        driver_booking_table.heading("Date and Time", text="Date and Time", anchor=W)
+        driver_booking_table.heading("Destination", text="Destination", anchor=W)
+        driver_booking_table.heading("Total Cost", text="Total Cost", anchor=W)
+        driver_booking_table.heading("Status", text="Status", anchor=W)
+
+        upcoming_trip_control = user_controller()
+        trip_fetched_data = upcoming_trip_control.upcoming_trip_detail_fetcher(userid)
+
+        for data in trip_fetched_data:
+
+            driver_booking_table.insert(
+                "",
+                index="end",
+                values=(
+                    data[0],
+                    (data[2], data[3]),
+                    (data[6], "---", data[7], ":", data[8]),
+                    data[10],
+                    data[11],
+                    data[16],
+                ),
+            )

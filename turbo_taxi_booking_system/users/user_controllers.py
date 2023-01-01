@@ -231,3 +231,16 @@ class UserController:
                 cursor.close()
             if self._connection is not None:
                 self._connection.close()
+
+    def upcoming_trip_detail_fetcher(self, user_id):
+
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM booking as b JOIN drivers as d on b.driver_id = d.driverid JOIN taxi as t on d.taxi_number = t.taxi_number WHERE user_id = %s AND b.booking_status = 'Pending' OR b.booking_status = 'Accepted';"
+            uid = str(user_id)
+            data = uid
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
