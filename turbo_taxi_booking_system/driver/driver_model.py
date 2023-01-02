@@ -8,6 +8,8 @@ name_reg = re.compile(
 )  # fullname regex
 contact_reg = re.compile("^[0-9]{10}$")  # contact regex
 
+username_reg = re.compile("[a-z][a-z0-9]*([._-][a-z0-9]+){0,3}$")  # username regex
+
 
 class DriverModel(BaseModel):
 
@@ -15,6 +17,8 @@ class DriverModel(BaseModel):
     license_number: str = ""
     contact: str = ""
     taxi_number: str = ""
+    username: str = ""
+    password: str = ""
 
     @validator("fullname")
     def fullname_validator(cls, value):
@@ -44,4 +48,12 @@ class DriverModel(BaseModel):
             raise CustomException("taxi number cannot be empty !!")
         if value == "taxi_number":
             raise CustomException("please select taxi number!!")
+        return value
+
+    @validator("username")
+    def validate_username(cls, value):
+        if not value:
+            raise CustomException("username cannot be empty")
+        if not username_reg.match(value):
+            raise CustomException("invalid format for username")
         return value

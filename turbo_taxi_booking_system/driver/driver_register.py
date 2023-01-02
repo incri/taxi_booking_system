@@ -149,6 +149,55 @@ class DriverRegisterPage:
             ),
         )
 
+        username = tk.Label(driver_register_frame)
+        username.place(relx=0.065, rely=0.430, height=41, width=104)
+        username.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            compound="left",
+            background="#FFFFFF",
+            font="-family {Noto Sans} -size 14",
+            text="""username""",
+        )
+
+        username_entry = tk.Entry(driver_register_frame)
+        username_entry.place(
+            relx=0.065,
+            rely=0.500,
+            height=23,
+            relwidth=0.404,
+        )
+        username_entry.configure(
+            background="#EFF0F2",
+            font="TkFixedFont",
+            selectbackground="#c4c4c4",
+        )
+
+        password = tk.Label(driver_register_frame)
+        password.place(relx=0.543, rely=0.430, height=41, width=104)
+        password.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            compound="left",
+            background="#FFFFFF",
+            font="-family {Noto Sans} -size 14",
+            text="""password""",
+        )
+
+        password_entry = tk.Entry(driver_register_frame)
+        password_entry.place(
+            relx=0.543,
+            rely=0.500,
+            height=23,
+            relwidth=0.404,
+            show="*",
+        )
+        password_entry.configure(
+            background="#EFF0F2",
+            font="TkFixedFont",
+            selectbackground="#c4c4c4",
+        )
+
         update_button = tk.Button(driver_register_frame)
         update_button.place(relx=0.522, rely=0.864, height=43, width=111)
         update_button.configure(
@@ -164,6 +213,8 @@ class DriverRegisterPage:
                 license_entry,
                 contact_entry,
                 selected_taxi_number,
+                username_entry,
+                password_entry,
             ),
         )
 
@@ -206,8 +257,8 @@ class DriverRegisterPage:
         driver_register_frame = tk.Frame(driver_register_frame)
         driver_register_frame.place(
             relx=0.065,
-            rely=0.501,
-            height=180,
+            rely=0.570,
+            height=150,
             relwidth=0.883,
         )
         driver_register_frame.config(
@@ -324,6 +375,8 @@ class DriverRegisterPage:
         license_entry,
         contact_entry,
         selected_taxi_number,
+        username_entry,
+        password_entry,
     ):
         try:
             driver = DriverModel(
@@ -331,6 +384,8 @@ class DriverRegisterPage:
                 license_number=license_entry.get(),
                 contact=contact_entry.get(),
                 taxi_number=selected_taxi_number.get(),
+                username=username_entry.get(),
+                password=password_entry.get(),
             )
 
             driver_control = DriverController()

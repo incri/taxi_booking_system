@@ -1,5 +1,6 @@
 from tkinter import messagebox
 from helper.turbo_db import Turbo_db
+from .driver_dashboard import DriverDashboard
 
 
 class DriverController:
@@ -23,12 +24,14 @@ class DriverController:
                 license_number    VARCHAR(50) NOT NULL UNIQUE,
                 contact VARCHAR(20) NOT NULL,
                 taxi_number VARCHAR(50) NOT NULL,
-                driver_status   VARCHAR(50) NOT NULL
+                driver_status   VARCHAR(50) NOT NULL,
+                username        VARCHAR(50) NOT NULL UNIQUE,
+                password        VARCHAR(50) NOT NULL
                 
             );"""
 
             data_insert = """INSERT INTO drivers(fullname, license_number,
-            contact, taxi_number, driver_status) VALUES (%s, %s, %s, %s, %s);
+            contact, taxi_number, driver_status, username, password) VALUES (%s, %s, %s, %s, %s, %s, %s);
             """
             data_values = (
                 driver.fullname,
@@ -36,6 +39,8 @@ class DriverController:
                 driver.contact,
                 driver.taxi_number,
                 "Available",
+                driver.username,
+                driver.password,
             )
 
             cursor.execute(statement)
@@ -61,3 +66,76 @@ class DriverController:
 
     def registration_sucess(self, driver_register_frame):
         driver_register_frame.destroy()
+
+    def driver_login_control(self, driver, login_frame, root):
+        if self.login_authenticate(driver):
+            self.login_sucess(root, login_frame)
+        else:
+            messagebox.showerror(
+                "Invalid Data",
+                "username or password not matched",
+            )
+
+    def login_authenticate(self, admin):
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM drivers WHERE username=%s AND password = %s;"
+            data = (admin.username, admin.password)
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            if self.record:
+                return True
+            return False
+        except Exception as error:
+            print(error)
+
+    def login_sucess(self, root, login_page):
+        messagebox.showinfo(title="Congratulation", message="Welcome ")
+        login_page.destroy()
+        DriverDashboard(root, DriverController, self.record)
+
+    def upcoming_trip_detail_fetcher(self, driver_id):
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM booking as b LEFT JOIN drivers as d on b.driver_id = d.driverid LEFT JOIN taxi as t on d.taxi_number = t.taxi_number WHERE d.driverid = %s AND b.booking_status = 'Accepted';"
+            did = str(driver_id)
+            data = did
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def completed_trip_detail_fetcher(self, driver_id):
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM booking as b LEFT JOIN drivers as d on b.driver_id = d.driverid LEFT JOIN taxi as t on d.taxi_number = t.taxi_number WHERE d.driverid = %s AND b.booking_status = 'Completed';"
+            did = str(driver_id)
+            data = did
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def completed_trip_controller(self, booking_id, driver_id):
+
+        try:
+            cursor = self._connection.cursor()
+            booking_statement = (
+                "Update booking set booking_status = 'Completed' Where booking_id = %s;"
+            )
+            bid = str(booking_id)
+            did = str(driver_id)
+            booking_data = bid
+            cursor.execute(booking_statement, booking_data)
+
+            driver_statement = (
+                "Update drivers set driver_status = 'Available' Where driverid = %s;"
+            )
+            driver_data = did
+            cursor.execute(driver_statement, driver_data)
+
+            self._connection.commit()
+        except Exception as error:
+            print(error)

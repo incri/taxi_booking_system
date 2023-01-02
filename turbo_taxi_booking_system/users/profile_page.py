@@ -1173,8 +1173,8 @@ class ProfilePage:
             text="""Taxi Details :""",
         )
 
-        data29 = str(data[29])
-        data30 = str(data[30])
+        data29 = str(data[31])
+        data30 = str(data[32])
 
         if (data29) == "None":
             data29 = ""
@@ -1204,7 +1204,7 @@ class ProfilePage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text=data[31],
+            text=data[33],
         )
 
         back_button = tk.Button(upcoming_booking_detail_frame)
