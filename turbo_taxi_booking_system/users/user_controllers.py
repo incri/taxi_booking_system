@@ -245,3 +245,15 @@ class UserController:
             return self.record
         except Exception as error:
             print(error)
+
+    def user_profile_booking_data_fetcher(self, selected_booking_id):
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM booking as b LEFT JOIN drivers as d on b.driver_id = d.driverid LEFT JOIN taxi as t on d.taxi_number = t.taxi_number WHERE b.booking_id = %s;"
+            bid = str(selected_booking_id)
+            data = bid
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)

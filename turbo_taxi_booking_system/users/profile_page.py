@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 from io import BytesIO
 from .user_model import UserModel
 from helper.exceptions import CustomException
+from tkintermapview import TkinterMapView
 
 
 class ProfilePage:
@@ -746,24 +747,24 @@ class ProfilePage:
 
         # driver Table Build
 
-        driver_booking_table = ttk.Treeview(
+        upcoming_booking_table = ttk.Treeview(
             upcoming_trip_table,
             yscrollcommand=table_scroll_bar.set,
             selectmode="extended",
         )
-        driver_booking_table.place(
+        upcoming_booking_table.place(
             relx=0,
             rely=0,
             height=280,
             width=1180,
         )
-        # driver a scroll bar
+        # upcoming a scroll bar
 
         table_scroll_bar.config(
-            command=driver_booking_table.yview,
+            command=upcoming_booking_table.yview,
         )
 
-        driver_booking_table["columns"] = (
+        upcoming_booking_table["columns"] = (
             "Booking ID",
             "Full Name",
             "Date and Time",
@@ -773,30 +774,30 @@ class ProfilePage:
         )
         # Format Our Columns
 
-        driver_booking_table.column("#0", width=0, stretch=NO)
-        driver_booking_table.column("Booking ID", width=20, anchor=W)
-        driver_booking_table.column("Full Name", width=70, anchor=W)
-        driver_booking_table.column("Date and Time", width=70, anchor=W)
-        driver_booking_table.column("Destination", width=240, anchor=W)
-        driver_booking_table.column("Total Cost", width=40, anchor=W)
-        driver_booking_table.column("Status", width=40, anchor=W)
+        upcoming_booking_table.column("#0", width=0, stretch=NO)
+        upcoming_booking_table.column("Booking ID", width=20, anchor=W)
+        upcoming_booking_table.column("Full Name", width=70, anchor=W)
+        upcoming_booking_table.column("Date and Time", width=70, anchor=W)
+        upcoming_booking_table.column("Destination", width=240, anchor=W)
+        upcoming_booking_table.column("Total Cost", width=40, anchor=W)
+        upcoming_booking_table.column("Status", width=40, anchor=W)
 
         # Create Heading
 
-        driver_booking_table.heading("#0", text="", anchor=W)
-        driver_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
-        driver_booking_table.heading("Full Name", text="Full Name", anchor=W)
-        driver_booking_table.heading("Date and Time", text="Date and Time", anchor=W)
-        driver_booking_table.heading("Destination", text="Destination", anchor=W)
-        driver_booking_table.heading("Total Cost", text="Total Cost", anchor=W)
-        driver_booking_table.heading("Status", text="Status", anchor=W)
+        upcoming_booking_table.heading("#0", text="", anchor=W)
+        upcoming_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
+        upcoming_booking_table.heading("Full Name", text="Full Name", anchor=W)
+        upcoming_booking_table.heading("Date and Time", text="Date and Time", anchor=W)
+        upcoming_booking_table.heading("Destination", text="Destination", anchor=W)
+        upcoming_booking_table.heading("Total Cost", text="Total Cost", anchor=W)
+        upcoming_booking_table.heading("Status", text="Status", anchor=W)
 
         upcoming_trip_control = user_controller()
         trip_fetched_data = upcoming_trip_control.upcoming_trip_detail_fetcher(userid)
 
         for data in trip_fetched_data:
 
-            driver_booking_table.insert(
+            upcoming_booking_table.insert(
                 "",
                 index="end",
                 values=(
@@ -808,3 +809,415 @@ class ProfilePage:
                     data[16],
                 ),
             )
+
+            upcoming_booking_table.bind(
+                "<Double-1>",
+                lambda event: ProfilePage.user_profile_booking_detail(
+                    event,
+                    upcoming_booking_table,
+                    user_controller,
+                ),
+            )
+
+    @staticmethod
+    def user_profile_booking_detail(
+        event,
+        upcoming_booking_table,
+        user_controller,
+    ):
+
+        selected = upcoming_booking_table.focus()
+        selected_row = upcoming_booking_table.item(
+            selected,
+            "values",
+        )
+        selected_booking_id = selected_row[0]
+
+        # Booking Details Data Fetcher
+
+        booking_data_control = user_controller()
+        fetched_booking_details = (
+            booking_data_control.user_profile_booking_data_fetcher(
+                selected_booking_id,
+            )
+        )
+
+        data = fetched_booking_details[0]
+
+        upcoming_booking_detail_frame = tk.Toplevel(upcoming_booking_table)
+        upcoming_booking_detail_frame.title("Assign Taxi")
+        upcoming_booking_detail_frame.geometry("682x641+193+31")
+        upcoming_booking_detail_frame.resizable(0, 0)
+        upcoming_booking_detail_frame.configure(background="#FFFFFF")
+
+        # BUILDING BOOKING DETAIL PAGE
+
+        title = tk.Label(upcoming_booking_detail_frame)
+        title.place(relx=0.360, rely=0.031, height=43, width=250)
+        title.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 18 -weight bold",
+            text="""Booking Details""",
+        )
+
+        fullname_label = tk.Label(upcoming_booking_detail_frame)
+        fullname_label.place(relx=0.029, rely=0.156, height=34, width=122)
+        fullname_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Full Name :""",
+        )
+
+        fullname_data = tk.Label(upcoming_booking_detail_frame)
+        fullname_data.place(relx=0.22, rely=0.156, height=34, width=280)
+        fullname_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[2] + " " + data[3],
+        )
+
+        map_view_frame = tk.Frame(upcoming_booking_detail_frame)
+        map_view_frame.place(relx=0.640, rely=0.156, height=140, width=220)
+        map_view_frame.configure(
+            background="#FFFFFF",
+            borderwidth="2",
+            highlightthickness="2",
+        )
+
+        location_detail_map_view = TkinterMapView(map_view_frame)
+        location_detail_map_view.set_tile_server(
+            "https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga",
+            max_zoom=60,
+        )
+
+        pickup_cordinates = eval(data[19])
+        destination_coordinates = eval(data[20])
+
+        location_detail_map_view.set_marker(
+            pickup_cordinates[0],
+            pickup_cordinates[1],
+        )
+
+        location_detail_map_view.set_marker(
+            destination_coordinates[0],
+            destination_coordinates[1],
+        )
+
+        location_detail_map_view.set_position(
+            pickup_cordinates[0],
+            pickup_cordinates[1],
+        )
+
+        location_detail_map_view.set_path(
+            position_list=[pickup_cordinates, destination_coordinates]
+        )
+
+        location_detail_map_view.pack()
+
+        passenger_no_label = tk.Label(upcoming_booking_detail_frame)
+        passenger_no_label.place(relx=0.029, rely=0.234, height=34, width=175)
+        passenger_no_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""No of Passenger :""",
+        )
+
+        passenger_no_data = tk.Label(upcoming_booking_detail_frame)
+        passenger_no_data.place(relx=0.293, rely=0.234, height=34, width=48)
+        passenger_no_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[4],
+        )
+
+        booking_status = tk.Label(upcoming_booking_detail_frame)
+        booking_status.place(relx=0.029, rely=0.312, height=35, width=180)
+        booking_status.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Booking Status :""",
+        )
+
+        booking_status_data = tk.Label(upcoming_booking_detail_frame)
+        booking_status_data.place(relx=0.250, rely=0.312, height=35, width=150)
+        booking_status_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[16],
+        )
+
+        pick_up_date_lable = tk.Label(upcoming_booking_detail_frame)
+        pick_up_date_lable.place(relx=0.029, rely=0.39, height=34, width=133)
+        pick_up_date_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Pick Up Date :""",
+        )
+
+        pick_up_date_data = tk.Label(upcoming_booking_detail_frame)
+        pick_up_date_data.place(relx=0.249, rely=0.39, height=35, width=163)
+        pick_up_date_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[6],
+        )
+
+        time_label = tk.Label(upcoming_booking_detail_frame)
+        time_label.place(relx=0.513, rely=0.39, height=34, width=69)
+        time_label.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Time :""",
+        )
+
+        data7 = str(data[7])
+        data8 = str(data[8])
+        time_data = tk.Label(upcoming_booking_detail_frame)
+        time_data.place(relx=0.616, rely=0.39, height=34, width=100)
+        time_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=(data7 + ":" + data8),
+        )
+
+        pick_up_address_label = tk.Label(upcoming_booking_detail_frame)
+        pick_up_address_label.place(relx=0.029, rely=0.468, height=35, width=175)
+        pick_up_address_label.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Pick Up Address :""",
+        )
+
+        pickup_address_data = tk.Label(upcoming_booking_detail_frame)
+        pickup_address_data.place(relx=0.293, rely=0.468, height=35, width=323)
+        pickup_address_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[9],
+        )
+
+        destination_label = tk.Label(upcoming_booking_detail_frame)
+        destination_label.place(relx=0.029, rely=0.546, height=34, width=132)
+
+        destination_label.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Destination :""",
+        )
+
+        destination_address_lable = tk.Label(upcoming_booking_detail_frame)
+        destination_address_lable.place(relx=0.249, rely=0.546, height=34, width=323)
+        destination_address_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[10],
+        )
+
+        total_cost_label = tk.Label(upcoming_booking_detail_frame)
+        total_cost_label.place(relx=0.029, rely=0.624, height=34, width=111)
+        total_cost_label.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Total Cost :""",
+        )
+
+        total_cost_data = tk.Label(upcoming_booking_detail_frame)
+        total_cost_data.place(relx=0.22, rely=0.624, height=34, width=206)
+        total_cost_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[11] + " .NPR",
+        )
+
+        payment_method_lable = tk.Label(upcoming_booking_detail_frame)
+        payment_method_lable.place(relx=0.029, rely=0.702, height=33, width=185)
+        payment_method_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Payment Method :""",
+        )
+        payment_method_data = tk.Label(upcoming_booking_detail_frame)
+        payment_method_data.place(relx=0.293, rely=0.702, height=34, width=206)
+        payment_method_data.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[12],
+        )
+
+        driver_details_lable = tk.Label(upcoming_booking_detail_frame)
+        driver_details_lable.place(relx=0.029, rely=0.780, height=33, width=185)
+        driver_details_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Driver Details :""",
+        )
+        driver_details_name = tk.Label(upcoming_booking_detail_frame)
+        driver_details_name.place(relx=0.250, rely=0.780, height=34, width=206)
+        driver_details_name.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[23],
+        )
+
+        driver_details_number = tk.Label(upcoming_booking_detail_frame)
+        driver_details_number.place(relx=0.600, rely=0.780, height=34, width=206)
+        driver_details_number.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[25],
+        )
+
+        taxi_details_lable = tk.Label(upcoming_booking_detail_frame)
+        taxi_details_lable.place(relx=0.025, rely=0.858, height=33, width=185)
+        taxi_details_lable.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Taxi Details :""",
+        )
+
+        data29 = str(data[29])
+        data30 = str(data[30])
+
+        if (data29) == "None":
+            data29 = ""
+        if (data30) == "None":
+            data30 = ""
+
+        taxi_details_name = tk.Label(upcoming_booking_detail_frame)
+        taxi_details_name.place(relx=0.220, rely=0.858, height=34, width=465)
+        taxi_details_name.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data29 + " " + data30,
+        )
+
+        taxi_details_number = tk.Label(upcoming_booking_detail_frame)
+        taxi_details_number.place(relx=0.220, rely=0.936, height=34, width=206)
+        taxi_details_number.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            highlightthickness="2",
+            text=data[31],
+        )
+
+        back_button = tk.Button(upcoming_booking_detail_frame)
+        back_button.place(relx=0.865, rely=0.031, height=33, width=71)
+        back_button.configure(
+            activebackground="beige",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 10",
+            foreground="#FFFFFF",
+            text="""Back""",
+        )
+
+        upcoming_booking_detail_frame.wait_visibility()
+        upcoming_booking_detail_frame.grab_set()
+        upcoming_booking_detail_frame.mainloop()

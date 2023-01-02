@@ -185,7 +185,7 @@ class BookingPage:
         )
 
         today_date = date.today()
-        last_date = date.today() + timedelta(days=15)
+        last_date = date.today() + timedelta(days=5)
 
         date_entry = DateEntry(
             booking_form_frame,

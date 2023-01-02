@@ -746,6 +746,9 @@ class ControlPanelPage:
             foreground="#4A4A4A",
             text="""Time :""",
         )
+
+        data7 = str(data[7])
+        data8 = str(data[8])
         time_data = tk.Label(assign_taxi_frame)
         time_data.place(relx=0.616, rely=0.39, height=34, width=100)
         time_data.configure(
@@ -756,7 +759,7 @@ class ControlPanelPage:
             font="-family {Noto Sans} -size 14",
             foreground="#4A4A4A",
             highlightthickness="2",
-            text=data[7] + ":" + data[8],
+            text=(data7 + ":" + data8),
         )
 
         pickup_address_data = tk.Label(assign_taxi_frame)
@@ -1024,6 +1027,7 @@ class ControlPanelPage:
                 admin_controller,
                 selected_driver_type,
                 booking_id,
+                assign_taxi_frame,
             ),
         )
 
@@ -1035,6 +1039,7 @@ class ControlPanelPage:
                 admin_controller,
                 selected_driver_type,
                 booking_id,
+                assign_taxi_frame,
             )
 
         assign_table_frame.wait_visibility()
@@ -1047,6 +1052,7 @@ class ControlPanelPage:
         admin_controller,
         selected_driver_type,
         booking_id,
+        assign_taxi_frame,
     ):
 
         if selected_driver_type.get() == "Avalable":
@@ -1136,7 +1142,7 @@ class ControlPanelPage:
                     driver_booking_table,
                     admin_controller,
                     booking_id,
-                    assign_table_frame,
+                    assign_taxi_frame,
                 ),
             )
 
@@ -1231,7 +1237,7 @@ class ControlPanelPage:
         driver_booking_table,
         admin_controller,
         booking_details,
-        assign_table_frame,
+        assign_taxi_frame,
     ):
         selected_row = driver_booking_table.focus()
         driver_id = driver_booking_table.item(selected_row, "values")
@@ -1249,4 +1255,4 @@ class ControlPanelPage:
             + str(booking_id),
         )
 
-        assign_table_frame.destroy()
+        assign_taxi_frame.destroy()
