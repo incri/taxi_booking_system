@@ -193,6 +193,7 @@ class BookingPage:
             mindate=today_date,
             maxdate=last_date,
             state="readonly",
+            date_pattern="yyyy/mm/dd",
         )
         date_entry.place(relx=0.185, rely=0.556, height=33, relwidth=0.092)
 

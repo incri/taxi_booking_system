@@ -139,3 +139,27 @@ class DriverController:
             self._connection.commit()
         except Exception as error:
             print(error)
+
+    def driver_booking_data_fetcher(self, driver_id):
+        try:
+            cursor = self._connection.cursor()
+            statement = "select sum(CAST(total_cost AS decimal)) from booking as b join drivers as d on b.driver_id = d.driverid where b.booking_status = 'Completed' AND d.driverid = %s; "
+            did = str(driver_id)
+            data = did
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def driver_profile_data_fetcher(self, driver_id):
+        try:
+            cursor = self._connection.cursor()
+            statement = "select * from drivers as d join taxi as t on d.taxi_number = t.taxi_number where d.driverid = %s;"
+            did = str(driver_id)
+            data = did
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)

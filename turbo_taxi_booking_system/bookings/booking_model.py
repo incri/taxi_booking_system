@@ -1,4 +1,5 @@
 from ast import Return
+from datetime import datetime
 import re
 from pydantic import BaseModel, ValidationError, root_validator, validator
 from helper.exceptions import CustomException
@@ -40,9 +41,11 @@ class BookingModel(BaseModel):
     def validate_time(cls, value):
         pick_up_hrs = value.get("pick_up_hrs")
         pick_up_min = value.get("pick_up_min")
-        if pick_up_hrs == "" and pick_up_hrs:
+        pick_up_date = value.get("pick_up_date")
+
+        if not pick_up_hrs:
             raise CustomException("time(Hour) cannot be empty")
-        if pick_up_min == "":
+        if not pick_up_min:
             raise CustomException("time(Minutes) cannot be empty")
 
         if pick_up_hrs == str:
@@ -54,7 +57,19 @@ class BookingModel(BaseModel):
             raise CustomException("time(Hour) invalid")
         if pick_up_min >= 60:
             raise CustomException("time(Minutes) invalid")
-        return value
+        else:
+            trip_date = datetime.strptime(pick_up_date, "%Y/%m/%d").date()
+            trip_time = str(pick_up_hrs) + ":" + str(pick_up_min) + ":00"
+            time_final = datetime.strptime(trip_time, "%H:%M:%S").time()
+
+            trip_date_and_time = datetime.combine(trip_date, time_final)
+            today = datetime.now().isoformat(" ", "seconds")
+            today_date = datetime.strptime(today, "%Y-%m-%d %H:%M:%S")
+
+            if today_date > trip_date_and_time:
+                raise CustomException("invalid time given")
+            else:
+                return value
 
     @root_validator
     def validate_location(cls, value):

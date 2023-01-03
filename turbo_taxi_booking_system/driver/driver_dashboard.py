@@ -83,6 +83,25 @@ class DriverDashboard:
             ),
         )
 
+        profile_refresh_button = tk.Button(dashboard_frame)
+        profile_refresh_button.place(relx=0.720, rely=0.450, height=35, width=100)
+        profile_refresh_button.configure(
+            background="#FFFFFF",
+            compound="left",
+            text="Update",
+            command=lambda: DriverDashboard.driver_profile_frame_create(
+                dashboard_frame,
+                driver_controller,
+                record,
+            ),
+        )
+
+        DriverDashboard.driver_profile_frame_create(
+            dashboard_frame,
+            driver_controller,
+            record,
+        )
+
         dashboard_frame.mainloop()
 
     @staticmethod
@@ -664,3 +683,189 @@ class DriverDashboard:
                     data[16],
                 ),
             )
+
+    @staticmethod
+    def driver_profile_frame_create(
+        dashboard_frame,
+        driver_controller,
+        record,
+    ):
+        profile_details_label = tk.Frame(dashboard_frame)
+        profile_details_label.place(relx=0.720, rely=0.068, height=280, width=325)
+        profile_details_label.configure(
+            background="#FFFFFF",
+            highlightthickness="2",
+            relief="flat",
+        )
+
+        for data in record:
+            driver_id = data[0]
+
+        driver_profile_data_control = driver_controller()
+        profile_details = driver_profile_data_control.driver_profile_data_fetcher(
+            driver_id
+        )
+
+        driver_profile_data_control = driver_controller()
+        booking_details = driver_profile_data_control.driver_booking_data_fetcher(
+            driver_id
+        )
+
+        profile_data = profile_details[0]
+        booking_data = booking_details[0]
+
+        username_data = tk.Label(profile_details_label)
+        username_data.place(relx=0.215, rely=0.036, height=41, width=184)
+        username_data.configure(
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14 -weight bold",
+            foreground="#4A4A4A",
+            text=profile_data[6],
+        )
+
+        name_label = tk.Label(profile_details_label)
+        name_label.place(relx=0.062, rely=0.25, height=31, width=64)
+        name_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Name :""",
+        )
+
+        name_data = tk.Label(profile_details_label)
+        name_data.place(relx=0.277, rely=0.25, height=31, width=184)
+        name_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text=profile_data[1],
+        )
+
+        contact_label = tk.Label(profile_details_label)
+        contact_label.place(relx=0.062, rely=0.357, height=31, width=74)
+        contact_label.configure(
+            activebackground="#f9f9f9",
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Contact :""",
+        )
+        contact_data = tk.Label(profile_details_label)
+        contact_data.place(relx=0.308, rely=0.357, height=31, width=104)
+        contact_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text=profile_data[3],
+        )
+
+        taxi_label = tk.Label(profile_details_label)
+        taxi_label.place(relx=0.062, rely=0.464, height=31, width=54)
+        taxi_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Taxi :""",
+        )
+        taxi_data = tk.Label(profile_details_label)
+        taxi_data.place(relx=0.246, rely=0.464, height=31, width=184)
+        taxi_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text=(profile_data[9] + " " + profile_data[10]),
+        )
+
+        taxi_number_label = tk.Label(profile_details_label)
+        taxi_number_label.place(relx=0.062, rely=0.571, height=31, width=114)
+        taxi_number_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Taxi number :""",
+        )
+
+        taxi_number_data = tk.Label(profile_details_label)
+        taxi_number_data.place(relx=0.431, rely=0.571, height=31, width=134)
+        taxi_number_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text=profile_data[11],
+        )
+
+        total_revenue_label = tk.Label(profile_details_label)
+        total_revenue_label.place(relx=0.062, rely=0.714, height=41, width=154)
+        total_revenue_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="""Total  Revenue :""",
+        )
+
+        total_revenue_data = tk.Label(profile_details_label)
+        total_revenue_data.place(relx=0.031, rely=0.857, height=31, width=304)
+        total_revenue_data.configure(
+            anchor="center",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14",
+            foreground="#4A4A4A",
+            text="XXXXX",
+        )
+
+        data_view_button = tk.Button(profile_details_label)
+        data_view_button.place(relx=0.554, rely=0.75, height=23, width=41)
+        data_view_button.configure(
+            background="#FFFFFF",
+            compound="left",
+            text="""00""",
+        )
+
+        data_view_button.bind(
+            "<Button-1>",
+            lambda event: DriverDashboard.show_revenue(
+                event,
+                total_revenue_data,
+                booking_data,
+            ),
+        )
+
+        data_view_button.bind(
+            "<ButtonRelease-1>",
+            lambda event: DriverDashboard.hide_revenue(
+                event,
+                total_revenue_data,
+            ),
+        )
+
+    @staticmethod
+    def show_revenue(event, total_revenue_data, booking_data):
+        total_revenue_data.config(text=booking_data)
+        total_revenue_data.update()
+
+    @staticmethod
+    def hide_revenue(
+        event,
+        total_revenue_data,
+    ):
+        total_revenue_data.config(text="XXXXX")
