@@ -190,12 +190,12 @@ class DriverRegisterPage:
             rely=0.500,
             height=23,
             relwidth=0.404,
-            show="*",
         )
         password_entry.configure(
             background="#EFF0F2",
             font="TkFixedFont",
             selectbackground="#c4c4c4",
+            show="*",
         )
 
         update_button = tk.Button(driver_register_frame)

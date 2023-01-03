@@ -1,5 +1,8 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import NO, W, Scrollbar, ttk
+from tkinter import messagebox
+
 from helper.constants import LOGO_LOCATION
 from tkintermapview import TkinterMapView
 
@@ -507,9 +510,32 @@ class DriverDashboard:
                 foreground="#FFFFFF",
                 text="""Trip Completed""",
                 command=lambda: DriverDashboard.trip_completed(
-                    trip_fetched_data, driver_controller
+                    trip_fetched_data,
+                    driver_controller,
+                    driver_trip_frame,
                 ),
             )
+
+            # Comparing today date and trip date
+
+            trip_date = data[6]
+            trip_time = str(data[7]) + ":" + str(data[8]) + ":00"
+            time_final = datetime.strptime(trip_time, "%H:%M:%S").time()
+
+            trip_date_and_time = datetime.combine(trip_date, time_final)
+            today = datetime.now().isoformat(" ", "seconds")
+            today_date = datetime.strptime(today, "%Y-%m-%d %H:%M:%S")
+
+            if today_date < trip_date_and_time:
+                trip_completed_button.config(state="disable")
+                trip_completed_button.update()
+            else:
+                trip_completed_button.config(state="normal")
+                trip_completed_button.update()
+
+            if data[16] == "Completed":
+                trip_completed_button.config(state="disable")
+                trip_completed_button.update()
 
             back_button = tk.Button(driver_trip_frame)
             back_button.place(relx=0.865, rely=0.031, height=33, width=71)
@@ -527,7 +553,7 @@ class DriverDashboard:
             driver_trip_frame.mainloop()
 
     @staticmethod
-    def trip_completed(trip_fetched_data, driver_controller):
+    def trip_completed(trip_fetched_data, driver_controller, driver_trip_frame):
         for data in trip_fetched_data:
 
             booking_id = data[0]
@@ -535,3 +561,106 @@ class DriverDashboard:
 
         trip_complete_control = driver_controller()
         trip_complete_control.completed_trip_controller(booking_id, driver_id)
+        messagebox.showinfo("Sucess", "Marked as completed ")
+        driver_trip_frame.destroy()
+
+    @staticmethod
+    def completed_trip_table(table_frame, driver_controller, record):
+        title = tk.Label(table_frame)
+        title.place(relx=0, rely=0, height=40, width=212)
+        title.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 18 -weight bold",
+            foreground="#3056D3",
+            text="""completed Trip""",
+        )
+
+        table_style = ttk.Style()
+        table_style.theme_use("default")
+        table_style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+            rowheight="35",
+            fieldbackground="#FFFFFF",
+        )
+        table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+        table_scroll_bar = Scrollbar(table_frame)
+        table_scroll_bar.place(relx=0.985, rely=0.250, height=118, width=15)
+
+        completed_booking_table = ttk.Treeview(
+            table_frame,
+            yscrollcommand=table_scroll_bar.set,
+            selectmode="extended",
+        )
+
+        completed_booking_table.bind(
+            "<Double-1>",
+            lambda event: DriverDashboard.driver_trip_detail(
+                event, table_frame, trip_fetched_data, driver_controller
+            ),
+        )
+        completed_booking_table.place(
+            relx=0,
+            rely=0.250,
+            height=118,
+            width=1125,
+        )
+
+        table_scroll_bar.config(
+            command=completed_booking_table.yview,
+        )
+
+        completed_booking_table["columns"] = (
+            "Booking ID",
+            "Full Name",
+            "Date and Time",
+            "Destination",
+            "Total Cost",
+            "Status",
+        )
+        # Format Our Columns
+
+        completed_booking_table.column("#0", width=0, stretch=NO)
+        completed_booking_table.column("Booking ID", width=20, anchor=W)
+        completed_booking_table.column("Full Name", width=70, anchor=W)
+        completed_booking_table.column("Date and Time", width=70, anchor=W)
+        completed_booking_table.column("Destination", width=240, anchor=W)
+        completed_booking_table.column("Total Cost", width=40, anchor=W)
+        completed_booking_table.column("Status", width=40, anchor=W)
+
+        # Create Heading
+
+        completed_booking_table.heading("#0", text="", anchor=W)
+        completed_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
+        completed_booking_table.heading("Full Name", text="Full Name", anchor=W)
+        completed_booking_table.heading("Date and Time", text="Date and Time", anchor=W)
+        completed_booking_table.heading("Destination", text="Destination", anchor=W)
+        completed_booking_table.heading("Total Cost", text="Total Cost", anchor=W)
+        completed_booking_table.heading("Status", text="Status", anchor=W)
+
+        for data in record:
+            driver_id = data[0]
+
+        completed_trip_control = driver_controller()
+        trip_fetched_data = completed_trip_control.completed_trip_detail_fetcher(
+            driver_id
+        )
+
+        for data in trip_fetched_data:
+
+            completed_booking_table.insert(
+                "",
+                index="end",
+                values=(
+                    data[0],
+                    (data[2], data[3]),
+                    (data[6], "---", data[7], ":", data[8]),
+                    data[10],
+                    data[11],
+                    data[16],
+                ),
+            )
