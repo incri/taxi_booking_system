@@ -155,9 +155,23 @@ class DriverController:
     def driver_profile_data_fetcher(self, driver_id):
         try:
             cursor = self._connection.cursor()
-            statement = "select * from drivers as d join taxi as t on d.taxi_number = t.taxi_number where d.driverid = %s;"
+            statement = "select *  from drivers as d join taxi as t on d.taxi_number = t.taxi_number where d.driverid = %s;"
             did = str(driver_id)
             data = did
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)
+
+    def driver_monthly_data_fetcher(self, driver_id, today):
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT sum(CAST(total_cost AS decimal)) as gross_incrome, sum(CAST(total_cost AS decimal)/3) as service_cost, sum(CAST(total_cost AS decimal)-CAST(total_cost AS decimal)/3) as net_income from booking as b join drivers as d on b.driver_id = d.driverid where b.booking_status = 'Completed' AND d.driverid = %s AND CAST(b.pickup_date AS VARCHAR(50)) like concat('%%',%s,'%%');"
+            did = str(driver_id)
+            td = str(today)
+            data = (did, td)
+
             cursor.execute(statement, data)
             self.record = cursor.fetchall()
             return self.record

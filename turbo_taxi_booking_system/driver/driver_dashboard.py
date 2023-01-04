@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 import tkinter as tk
 from tkinter import NO, W, Scrollbar, ttk
 from tkinter import messagebox
@@ -858,6 +858,12 @@ class DriverDashboard:
             ),
         )
 
+        DriverDashboard.driver_payment_frame_create(
+            dashboard_frame,
+            record,
+            driver_controller,
+        )
+
     @staticmethod
     def show_revenue(event, total_revenue_data, booking_data):
         total_revenue_data.config(text=booking_data)
@@ -869,3 +875,170 @@ class DriverDashboard:
         total_revenue_data,
     ):
         total_revenue_data.config(text="XXXXX")
+
+    @staticmethod
+    def driver_payment_frame_create(
+        dashboard_frame,
+        record,
+        driver_controller,
+    ):
+
+        today = date.today().strftime("%Y-%m")
+
+        for data in record:
+            driver_id = data[0]
+
+        driver_profile_data_control = driver_controller()
+        monthly_revenue_details = (
+            driver_profile_data_control.driver_monthly_data_fetcher(
+                driver_id,
+                today,
+            )
+        )
+
+        monthly_income = monthly_revenue_details[0]
+
+        profile_details_label = tk.Frame(dashboard_frame)
+        profile_details_label.place(relx=0.470, rely=0.250, height=140, width=325)
+        profile_details_label.configure(
+            background="#FFFFFF",
+            highlightthickness="2",
+            relief="flat",
+        )
+
+        payment_label = tk.Label(profile_details_label)
+        payment_label.place(relx=0.215, rely=0.036, height=41, width=184)
+        payment_label.configure(
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 14 -weight bold",
+            foreground="#4A4A4A",
+            text="Monthly Revenue",
+        )
+
+        gross_income_label = tk.Label(profile_details_label)
+        gross_income_label.place(relx=0.062, rely=0.320, height=31, width=120)
+        gross_income_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Gross Income :""",
+        )
+
+        gross_income_data = tk.Label(profile_details_label)
+        gross_income_data.place(relx=0.445, rely=0.320, height=31, width=160)
+        gross_income_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text="XXXXX",
+        )
+
+        service_cost_label = tk.Label(profile_details_label)
+        service_cost_label.place(relx=0.062, rely=0.520, height=31, width=110)
+        service_cost_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Service Cost :""",
+        )
+        service_cost_data = tk.Label(profile_details_label)
+        service_cost_data.place(relx=0.410, rely=0.520, height=31, width=160)
+        service_cost_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text="XXXXX",
+        )
+
+        net_income_label = tk.Label(profile_details_label)
+        net_income_label.place(relx=0.062, rely=0.720, height=31, width=100)
+        net_income_label.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 12",
+            foreground="#4A4A4A",
+            text="""Net Income :""",
+        )
+        net_income_data = tk.Label(profile_details_label)
+        net_income_data.place(relx=0.380, rely=0.720, height=31, width=160)
+        net_income_data.configure(
+            anchor="w",
+            background="#FFFFFF",
+            compound="left",
+            font="-family {Noto Sans} -size 11",
+            foreground="#4A4A4A",
+            text="XXXXX",
+        )
+
+        data_view_button = tk.Button(profile_details_label)
+        data_view_button.place(relx=0.850, rely=0.055, height=23, width=41)
+        data_view_button.configure(
+            background="#FFFFFF",
+            compound="left",
+            text="""00""",
+        )
+
+        data_view_button.bind(
+            "<Button-1>",
+            lambda event: DriverDashboard.show_monthly_revenue(
+                event,
+                gross_income_data,
+                service_cost_data,
+                net_income_data,
+                monthly_income,
+            ),
+        )
+
+        data_view_button.bind(
+            "<ButtonRelease-1>",
+            lambda event: DriverDashboard.hide_monthly_revenue(
+                event,
+                gross_income_data,
+                service_cost_data,
+                net_income_data,
+            ),
+        )
+
+    @staticmethod
+    def show_monthly_revenue(
+        event,
+        gross_income_data,
+        service_cost_data,
+        net_income_data,
+        monthly_income,
+    ):
+
+        gross_income = str(round(monthly_income[0], 2))
+        service_cost = str(round(monthly_income[1], 2))
+        net_income = str(round(monthly_income[2], 2))
+
+        gross_income_data.config(text=gross_income)
+        gross_income_data.update()
+        service_cost_data.config(text=service_cost)
+        service_cost_data.update()
+        net_income_data.config(text=net_income)
+        net_income_data.update()
+
+    @staticmethod
+    def hide_monthly_revenue(
+        event,
+        gross_income_data,
+        service_cost_data,
+        net_income_data,
+    ):
+        gross_income_data.config(text="XXXXX")
+        gross_income_data.update()
+        service_cost_data.config(text="XXXXX")
+        service_cost_data.update()
+        net_income_data.config(text="XXXXX")
+        net_income_data.update()
