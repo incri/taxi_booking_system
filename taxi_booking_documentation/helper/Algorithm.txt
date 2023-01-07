@@ -1,0 +1,83 @@
+﻿Algorithm
+
+Flow of the development process
+
+    • Flow of the system hierarchy
+
+
+
+Taxi booking system
+
+    • The system : 
+
+       Main dashboard : SignUp and SignIn with visible working gallery
+
+       
+    (1) After clicking SignUp (SignUp as Customer will open up ) and also provide link for (SignUp as Worker)
+       
+    (2) Both form will require different information and will be saved on differet table of database
+
+
+    (1) After clicking SignIn (SignIn as Customer will open up ) and also provide link for (SignIn as Worker)
+       
+    (2) Both form will require same information username or email and password 
+
+
+
+
+
+type of user 
+
+    i. Customer ( The one who does the booking action ) : 
+
+Working of a customer :
+
+    1. SignUp  as customer 
+    2. SignUp With the all required details.
+    3. If all the validation is completed then the user will be redirected to login page
+    4. User will login with the given login Email or Username and password
+    5. User will be redirected to the user dashboard which cointain book now button, profile picture, profile name and some detail about the system (HINT)
+    6. Clicking on Book now It will redirect the user to booking form
+    7. Filling up all the requireded information user can click on Book button and then a booking request is send to the Taxi company for the approval
+    8. This will redirect the user to there dashboard.
+    9. Clicking on profile picture or the username on the dashboard, user will be redirected to the profile page.
+    10. Profile page will include all the previous booking history and ongoing booking information
+    11. Profile page will allow to edit the booking detail as well as the personal information
+    12. the gui must be good as each function should be changing the pages for each different function.
+    13. Booking can be canceled from the profle page until the trip date is more than one day.
+    14. The completed trip can be seen and the driver can be rated after wards.
+ ii . Admin (The one who assign the taxi and driver to the request trip)
+
+Working of a Admin :
+
+    1. Log In as Admin with Provided Username and Password
+    2. Admin should be redirected to Admin dashboard
+    3. The portal should cointain two option (Taxi Driver Control panel and Customer Booking request control panel)
+    4. clicking on Taxi Driver(It will provide all the list of registered taxi driver and List of all the taxi driver that wanted to register to the system with a valid information)
+    5. It will also provide all the information about the taxi driver after clicking the taxi driver name in a ID size card UI
+    6. It will give the admin full auth to accept or decline a register request for a taxi driver after doccumentation review.
+    7. Admin will be able to go to the previous page where they can select between the Driver and the customer control panel with a back button
+    8. Clicking on customer (It will provide the list of all the customer and can view there detail by clicking there name which will pop up a ID type UI)
+    9. You can view the Booking request made by the cusomer 
+    10. You can see the Driver that are already booked for a trip and available taxi driver that are suitable for the trip
+    11. In order to accept a trip clickinng on a requested customer name a Id type UI pop up and then clicking on assign taxi after checking the requested booking detail you can assign number of taxi for a trip and vechile number (number of taxi will allow to input number of taxi vehicle number with add button)
+    12. The booking for Customer XXXXX Has been completed message will be shown and then the pop up will close by its own.
+    13. Admin have full Auth to accept or decline offer if its seems sus.
+    14. Admin can band a regiestered user or a driver if they are found breaking the rules of a organization.
+
+
+
+iii . Driver (The One who are assigned for customer to complete the trip)
+
+Working of Driver :
+
+    1. Sign Up as Driver 
+    2. Sign Up with all the details (Full name, Address, Contact, Gender, Date Of birth, username, Email Address, experience, upload License photo upto 25mb, Vehicle number, Vehicle Registration Number)
+    3. If all the validation is completed then the user will be redirected to login page
+    4. User will login with the given login Email or Username and password
+    5. User will be redirected to the user dashboard 
+    6. Driver dashboard contain total income , Upcoming Trip, some information for the easy use, Profile Page
+    7. Clicking on profile picture or the username on the dashboard, user will be redirected to the profile page.
+    8. Profile page will include all the previous booking history and personal details
+    9. After the trip is assigned to the driver driver must take the trip as company requested but if the driver is not available driver can change there status from available to not available .
+    10. Chaging the status whill affect on admin page so the filter wont show the driver as a available driver and assigning the tax trip to such driver is not allowed.

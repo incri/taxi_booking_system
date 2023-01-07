@@ -1,0 +1,68 @@
+ Taxi  Booking Software 
+
+    • Scenario
+
+
+A taxi company would like to provide an online service for customers to book a trip and for taxi drivers to check their upcoming trips.  
+
+→  Make a texi booking online system
+→ Customer book a trip (Money, Time, Avaibility, Requirement)
+→ Texi Drive upcoming trip (Money, Time, Customer, Destination)
+
+
+
+Data needs to be stored in an external file – either a text file or database. 
+
+→ All input data must be stored 
+→ Linking the system with data base (Use Postgres database system)
+
+
+
+The following data, at least, would need to be stored and be retrievable - customer data (name, address, email, telephone number, payment method) and trip information (pick up and drop off address, and pickup time and date).Furthermore, you will need to store driver information (name and license plate).  Each trip must be assigned to exactly one driver (and trips allocated to a driver must not overlap). 
+
+
+→ Customer Data (name, address, email, telephone, payment method)
+→ trip information (pickup and dropoff address, pickup time and date, destination, charge)
+→ Driver iinformation (name, license plate, rating, avaibility)
+→ The date of a driver avaibility must be clear and should not overlap for a booked driver
+
+
+
+Customers who are not registered yet need to register - providing their name, address, phone number, email address and method of payment.  
+
+→ Provide a unregistered user a register form which include ( name, address, phone number, email address and method of payment)
+→ Payment method can be changeable during the booking as well
+→ Pickup address is not always the customer profile address
+A registered customer should be able to book a trip, ie. provide the pickup address and time as well as the drop off address – preferably via a graphical user interface.
+
+→ Regester account can log in to their dashboard with given login email or username and password
+→ After logging in user should be able to acess the booking system to book a taxi
+→ Taxi booking interface must be easy to use for the user
+
+
+  Customers should also be able to view their trips and cancel them if needed. 
+
+→ Every customer must have their profile page
+→ Profile must have fully functioning CRUD feature for their booking and personal detail
+
+
+All these operations are only possible after a customer signs in (which means they must be registered).
+
+→ Must register and login in order to use the booking system.
+
+  Each new trip booking must be confirmed by the taxi company administrator who must also assign a driver to the booking. Only one driver must be assigned to each confirmed booking. 
+
+→ Customer make booking request….
+→ Request goes to taxi company not the taxi driver
+→ Same as the semester I the booking req. is send to the taxi company then, check the taxi drive available, then appoint the taxi driver suitable for the trip 
+→ Booked taxi driver cannnot be booking again during the time period of a trip
+
+
+
+After logging in, taxi drivers must be able to view a list of their upcoming trips. 
+→  Taxi driver must have their dashboard as a up comiing trip information 
+→ Trip detail must be visible from the dashboard 
+→ Total icone and there performance should be shown in there dashboard
+
+
+

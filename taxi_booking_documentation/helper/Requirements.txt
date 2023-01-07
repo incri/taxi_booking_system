@@ -1,0 +1,21 @@
+﻿Requirements
+
+ 
+    • Functional requirements
+
+→ The list and discription of the services that the software mut offer
+→ It is the software system main compement
+→ The main feature of the software
+
+    • Non functional requirements
+→ Security
+→ Reliability
+→ maintaiability
+→ Scalability
+→ Upgrade and Update
+
+    • Usibility Requirements
+
+→ Requirements that user e able to flow through the task without being interrupted
+→ Validation, clear form, easy to use GUI
+→ Worse case of user problem should be as a main problem to be focus.

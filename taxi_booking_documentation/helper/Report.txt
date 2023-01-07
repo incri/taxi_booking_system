@@ -1,0 +1,24 @@
+Report
+
+    • Select the critical feature of the system and discribe them using as these of the following techniques.
+
+→ USECASE DIAGRAM (including at least 2 level of discription of system feature)
+→ ACTIVITY DIAGRAM 
+→ CLASS DIAGRAM
+
+
+    • Prior the implementation you should develop algorithm for the system . The algorith can be presented either visually or I text format
+
+→ Flow of the development process should be shown through visual or text formt
+→ We do this → Then this → Then that → Then this
+
+    • Use python to code the critical feature of the system you have analysed and perform some testing to show that your system work.
+
+→ All critical code must be done in python language
+→ After the completion of the code testing must be done to show that the code run correctly
+→ This is the implementation and the testing part
+
+    • As well as the basic language feature you will be credited by the  GUI and the good design technique
+      
+→ Basic design and good GUI also help to get a good marking
+

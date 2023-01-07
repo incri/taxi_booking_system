@@ -1,0 +1,36 @@
+Project: Title
+
+Requirement analysis and findings
+Group-1
+	Task-1
+	Task-2
+	Task-3
+Group-2
+	Task-1
+	Task-2
+GroupN
+	Task-1
+	Task-2
+	Task-3
+
+Top Level-Design
+1. Use Case (Min 2 Level)
+2. Activity Diagram (Application Level)
+3. Database Design 
+	- Download, install and configure database server
+	- Create databaase
+	- Connection info (host name, port, database user, password, database name)
+
+Group-1 Level Desing
+1.1. ER Diagram and Data Dictionary (Table)
+1.2 Class Diagram (Single Class/Multiple Classes)
+1.3 Middleware (Class Diagram)
+1.4 UI/UX (User Interface)
+1.5 Activity Diagram
+
+Group-1 Level Development
+1.6. 1.1 (Create table)
+1.7 1.2 (Create class -  varaibles, init, setters, getters, and str)
+1.8 1.3 (Create class with processing methods)
+1.9 1.4 (Create UI/UX)
+1.10 Test (Console and UI/UX)
