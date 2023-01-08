@@ -257,3 +257,29 @@ class UserController:
             return self.record
         except Exception as error:
             print(error)
+
+    def cancel_booking(self, booking_id):
+        try:
+            statement = "UPDATE booking SET booking_status = 'Canceled' WHERE booking_id = %s AND booking_status = 'Pending';"
+
+            b_id = str(booking_id)
+            cursor = self._connection.cursor()
+            data = b_id
+            cursor.execute(statement, data)
+            self._connection.commit()
+
+        except Exception as error:
+            print(error)
+
+    def history_trip_detail_fetcher(self, user_id):
+
+        try:
+            cursor = self._connection.cursor()
+            statement = "SELECT * FROM booking as b LEFT JOIN drivers as d on b.driver_id = d.driverid LEFT JOIN taxi as t on d.taxi_number = t.taxi_number WHERE b.booking_status = 'Completed' AND user_id = %s OR b.booking_status = 'Canceled' AND user_id = %s ;"
+            uid = str(user_id)
+            data = (uid, uid)
+            cursor.execute(statement, data)
+            self.record = cursor.fetchall()
+            return self.record
+        except Exception as error:
+            print(error)

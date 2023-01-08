@@ -1218,6 +1218,39 @@ class ProfilePage:
             text="""Back""",
         )
 
+        cancel_booking_button = tk.Button(upcoming_booking_detail_frame)
+        cancel_booking_button.place(relx=0.580, rely=0.936, height=34, width=130)
+        cancel_booking_button.configure(
+            activebackground="beige",
+            borderwidth="2",
+            compound="left",
+            font="-family {Noto Sans} -size 10 -weight bold",
+            text="""Cancel Booking""",
+            command=lambda: ProfilePage.user_cancel_booking(
+                user_controller, upcoming_booking_detail_frame, data
+            ),
+        )
+
+        if data[16] == "Accepted":
+            cancel_booking_button.config(state="disable")
+
         upcoming_booking_detail_frame.wait_visibility()
         upcoming_booking_detail_frame.grab_set()
         upcoming_booking_detail_frame.mainloop()
+
+    @staticmethod
+    def user_cancel_booking(
+        user_controller,
+        upcoming_booking_detail_frame,
+        data,
+    ):
+
+        booking_id = data[0]
+        response = messagebox.askquestion(
+            "Cancel Booking", "DO you really want to cancel this booking ?"
+        )
+
+        if response == "yes":
+            user_booking_cancel_control = user_controller()
+            user_booking_cancel_control.cancel_booking(booking_id)
+            upcoming_booking_detail_frame.destroy()

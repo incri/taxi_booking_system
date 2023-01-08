@@ -1,5 +1,6 @@
 import imp
 import tkinter as tk
+from tkinter import NO, W, Scrollbar, ttk
 from helper.constants import LOGO_LOCATION
 from PIL import Image, ImageTk
 from io import BytesIO
@@ -128,6 +129,8 @@ class DashboardPage:
             ),
         )
 
+        DashboardPage.booking_history_frame(dashboard_frame, record, user_controller)
+
         dashboard_frame.mainloop()
 
     @staticmethod
@@ -166,3 +169,89 @@ class DashboardPage:
         )
         user_control = user_controller()
         user_control.login_control(user, root)
+
+    @staticmethod
+    def booking_history_frame(dashboard_frame, record, user_controller):
+
+        for data in record:
+            userid = data[0]
+
+        history_tabel_frame = tk.Frame(dashboard_frame, bg="#FFFFFF")
+        history_tabel_frame.place(
+            relx=0.110,
+            rely=0.407,
+            height=229,
+            width=1160,
+        )
+        table_style = ttk.Style()
+        table_style.theme_use("default")
+        table_style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#4A4A4A",
+            rowheight="35",
+            fieldbackground="#FFFFFF",
+        )
+        table_style.map("Treeview", background=[("selected", "#C9C9C9")])
+
+        table_scroll_bar = Scrollbar(history_tabel_frame)
+        table_scroll_bar.place(relx=0.980, rely=0, height=229, width=15)
+
+        history_booking_table = ttk.Treeview(
+            history_tabel_frame,
+            yscrollcommand=table_scroll_bar.set,
+            selectmode="extended",
+        )
+        history_booking_table.place(
+            relx=0,
+            rely=0,
+            height=229,
+            width=1120,
+        )
+
+        table_scroll_bar.config(
+            command=history_booking_table.yview,
+        )
+
+        history_booking_table["columns"] = (
+            "Booking ID",
+            "Full Name",
+            "Date and Time",
+            "Destination",
+            "Total Cost",
+            "Status",
+        )
+
+        history_booking_table.column("#0", width=0, stretch=NO)
+        history_booking_table.column("Booking ID", width=20, anchor=W)
+        history_booking_table.column("Full Name", width=70, anchor=W)
+        history_booking_table.column("Date and Time", width=70, anchor=W)
+        history_booking_table.column("Destination", width=240, anchor=W)
+        history_booking_table.column("Total Cost", width=40, anchor=W)
+        history_booking_table.column("Status", width=40, anchor=W)
+
+        history_booking_table.heading("#0", text="", anchor=W)
+        history_booking_table.heading("Booking ID", text="Booking ID", anchor=W)
+        history_booking_table.heading("Full Name", text="Full Name", anchor=W)
+        history_booking_table.heading("Date and Time", text="Date and Time", anchor=W)
+        history_booking_table.heading("Destination", text="Destination", anchor=W)
+        history_booking_table.heading("Total Cost", text="Total Cost", anchor=W)
+        history_booking_table.heading("Status", text="Status", anchor=W)
+
+        history_trip_control = user_controller()
+        trip_fetched_data = history_trip_control.history_trip_detail_fetcher(userid)
+
+        for data in trip_fetched_data:
+
+            history_booking_table.insert(
+                "",
+                index="end",
+                values=(
+                    data[0],
+                    (data[2], data[3]),
+                    (data[6], "---", data[7], ":", data[8]),
+                    data[10],
+                    data[11],
+                    data[16],
+                ),
+            )
