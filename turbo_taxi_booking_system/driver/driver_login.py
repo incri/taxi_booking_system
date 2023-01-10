@@ -5,16 +5,9 @@ from .driver_controller import DriverController
 
 
 class DriverLogInPage:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.build_root()
+    def __init__(self, root):
+        self.root = root
         self.create_driver_login_frame()
-
-    def build_root(self):
-        self.root.title("Main Frame")
-        self.root.resizable(0, 0)
-        self.root.configure(background="#FFFFFF")
-        self.root.attributes("-fullscreen", True)
 
     def create_driver_login_frame(self):
         self.login_frame = tk.Frame(self.root)
@@ -102,8 +95,8 @@ class DriverLogInPage:
             compound="left",
             font="-family {Noto Sans} -size 12",
             foreground="#FFFFFF",
-            text="""Exit""",
-            command=lambda: DriverLogInPage.exit_application(root),
+            text="""Back""",
+            command=lambda: DriverLogInPage.exit_application(login_frame),
         )
 
         show_pass_button = tk.Button(login_frame)
@@ -149,8 +142,8 @@ class DriverLogInPage:
     ):
         password_entry.config(show="*")
 
-    def exit_application(root):
-        root.destroy()
+    def exit_application(login_frame):
+        login_frame.destroy()
 
     @staticmethod
     def admin_login(

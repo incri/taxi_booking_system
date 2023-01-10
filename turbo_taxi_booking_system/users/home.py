@@ -1,9 +1,15 @@
 import tkinter as tk
 from tkinter import messagebox
-from helper.constants import LOGO_LOCATION, BG_LOCATION
+from helper.constants import (
+    LOGO_LOCATION,
+    BG_LOCATION,
+    ADMIN_LOGO_LOCATION,
+    DRIVER_LOGO_LOCATION,
+)
 from users import sign_up_page
 from users import log_in_page
-from users import dashboard_page
+from admin.admin_login import LogInPage
+from driver.driver_login import DriverLogInPage
 
 
 class HomePage:
@@ -82,10 +88,14 @@ class HomePage:
         logo_image = tk.PhotoImage(file=LOGO_LOCATION)
         top_logo_lable.configure(image=logo_image)
 
-        sub_logo_label_1 = tk.Label(home_frame)
+        admin_logo_image = tk.PhotoImage(file=ADMIN_LOGO_LOCATION)
+        sub_logo_label_1 = tk.Button(home_frame)
         sub_logo_label_1.place(relx=0.110, rely=0.407, height=71, width=80)
-        sub_logo_label_1.configure(anchor="w", compound="left", background="#FFFFFF")
-        sub_logo_label_1.configure(image=logo_image)
+        sub_logo_label_1.configure(background="#FFFFFF", relief="flat")
+        sub_logo_label_1.configure(
+            image=admin_logo_image,
+            command=lambda: HomePage.redirect_to_admin_page(root),
+        )
 
         info_level_1 = tk.Label(home_frame)
         info_level_1.place(relx=0.17, rely=0.393, height=39, width=153)
@@ -94,7 +104,7 @@ class HomePage:
             background="#FFFFFF",
             compound="left",
             font="-family {Noto Sans} -size 12 -weight bold",
-            text="""Why Turbo TB ?""",
+            text="""Login As Admin ?""",
         )
 
         sub_info_level_1 = tk.Label(home_frame)
@@ -105,12 +115,16 @@ class HomePage:
             compound="left",
             foreground="#637381",
         )
-        sub_info_level_1.configure(text="""some information""")
+        driver_logo_image = tk.PhotoImage(file=DRIVER_LOGO_LOCATION)
+        sub_info_level_1.configure(text="click on the admin icon to login as admin.")
 
-        sub_logo_label_2 = tk.Label(home_frame)
+        sub_logo_label_2 = tk.Button(home_frame)
         sub_logo_label_2.place(relx=0.110, rely=0.583, height=71, width=80)
-        sub_logo_label_2.configure(anchor="w", compound="left", background="#FFFFFF")
-        sub_logo_label_2.configure(image=logo_image)
+        sub_logo_label_2.configure(background="#FFFFFF", relief="flat")
+        sub_logo_label_2.configure(
+            image=driver_logo_image,
+            command=lambda: HomePage.redirect_to_driver_page(root),
+        )
 
         info_level_2 = tk.Label(home_frame)
         info_level_2.place(relx=0.17, rely=0.57, height=39, width=153)
@@ -119,7 +133,7 @@ class HomePage:
             background="#FFFFFF",
             compound="left",
             font="-family {Noto Sans} -size 12 -weight bold",
-            text="""Services""",
+            text="""Login As Driver ?""",
         )
 
         sub_info_level_2 = tk.Label(home_frame)
@@ -129,7 +143,7 @@ class HomePage:
             foreground="#637381",
             background="#FFFFFF",
             compound="left",
-            text="some information",
+            text="click on the admin icon to login as driver.",
         )
 
         homebg_lable = tk.Label(home_frame)
@@ -190,6 +204,14 @@ class HomePage:
     @staticmethod
     def redirect_to_signup_page(root):
         sign_up_page.SignUpPage(root)
+
+    @staticmethod
+    def redirect_to_admin_page(root):
+        LogInPage(root)
+
+    @staticmethod
+    def redirect_to_driver_page(root):
+        DriverLogInPage(root)
 
     @staticmethod
     def redirect_to_login_page(root):
