@@ -77,9 +77,9 @@ class UserController:
         )
         signup_frame.destroy()
 
-    def login_control(self, user, root):
+    def login_control(self, user, root, login_frame):
         if self.login_authenticate(user):
-            self.login_sucess(root)
+            self.login_sucess(root, login_frame)
         else:
             messagebox.showerror("Invalid Data", "username or password not matched")
 
@@ -100,7 +100,8 @@ class UserController:
             return True
         return False
 
-    def login_sucess(self, root):
+    def login_sucess(self, root, login_frame):
+        login_frame.destroy()
         DashboardPage(
             root,
             self.record,

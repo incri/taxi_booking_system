@@ -173,7 +173,7 @@ class LogInPage:
             )
 
             user_control = UserController()
-            user_control.login_control(user, root)
-            login_frame.destroy()
+            user_control.login_control(user, root, login_frame)
+
         except CustomException as e:
             messagebox.showerror("Invalid Data", e)
