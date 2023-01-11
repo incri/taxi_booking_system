@@ -171,8 +171,9 @@ class LogInPage:
                 password=password_entry.get(),
                 confirm_password=password_entry.get(),
             )
-            login_frame.destroy()
+
             user_control = UserController()
             user_control.login_control(user, root)
+            login_frame.destroy()
         except CustomException as e:
             messagebox.showerror("Invalid Data", e)
